@@ -595,6 +595,20 @@ export class DispatchService {
     };
   }
 
+  async exportChallan(actor: AuthenticatedUser, id: string, format: string) {
+    const challanResponse = await this.getChallan(actor, id);
+    return {
+      success: true,
+      message: 'Delivery challan export payload generated successfully',
+      data: {
+        format,
+        fileName: `${challanResponse.data.challan.challanNo}.${format === 'xlsx' ? 'xlsx' : format === 'print' ? 'html' : 'pdf'}`,
+        challan: challanResponse.data.challan,
+        trip: challanResponse.data.trip,
+      },
+    };
+  }
+
   private async createTrip(
     actor: AuthenticatedUser,
     dto: {

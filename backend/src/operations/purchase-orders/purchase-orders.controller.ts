@@ -66,6 +66,15 @@ export class PurchaseOrdersController {
     return this.purchaseOrdersService.getItems(currentUser, id);
   }
 
+  @Get(':id/export')
+  export(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('format') format = 'pdf',
+  ) {
+    return this.purchaseOrdersService.export(currentUser, id, format);
+  }
+
   @Patch(':id')
   update(
     @CurrentUser() currentUser: AuthenticatedUser,

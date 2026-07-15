@@ -80,4 +80,13 @@ export class GoodsReceiptsController {
   ) {
     return this.goodsReceiptsService.getComparison(currentUser, id);
   }
+
+  @Get(':id/export')
+  export(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('format') format = 'pdf',
+  ) {
+    return this.goodsReceiptsService.export(currentUser, id, format);
+  }
 }

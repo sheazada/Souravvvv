@@ -120,4 +120,13 @@ export class DispatchController {
   ) {
     return this.dispatchService.getChallan(currentUser, id);
   }
+
+  @Get(':id/challan/export')
+  exportChallan(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('format') format = 'pdf',
+  ) {
+    return this.dispatchService.exportChallan(currentUser, id, format);
+  }
 }

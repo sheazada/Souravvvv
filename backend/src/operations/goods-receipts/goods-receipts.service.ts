@@ -476,6 +476,19 @@ export class GoodsReceiptsService {
     };
   }
 
+  async export(actor: AuthenticatedUser, id: string, format: string) {
+    const receipt = await this.findOne(actor, id);
+    return {
+      success: true,
+      message: 'Goods receipt export payload generated successfully',
+      data: {
+        format,
+        fileName: `${receipt.data.grnNo}.${format === 'xlsx' ? 'xlsx' : format === 'print' ? 'html' : 'pdf'}`,
+        goodsReceipt: receipt.data,
+      },
+    };
+  }
+
   private async prepareGrnItems(
     organizationId: string,
     rawItems: CreateGoodsReceiptDto['items'],

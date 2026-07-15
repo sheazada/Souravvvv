@@ -676,6 +676,19 @@ export class PurchaseOrdersService {
     };
   }
 
+  async export(actor: AuthenticatedUser, id: string, format: string) {
+    const purchaseOrder = await this.findOne(actor, id);
+    return {
+      success: true,
+      message: 'Purchase order export payload generated successfully',
+      data: {
+        format,
+        fileName: `${purchaseOrder.data.poNo}.${format === 'xlsx' ? 'xlsx' : format === 'print' ? 'html' : 'pdf'}`,
+        purchaseOrder: purchaseOrder.data,
+      },
+    };
+  }
+
   private async prepareManualItems(
     organizationId: string,
     rawItems: CreatePurchaseOrderDto['items'],
