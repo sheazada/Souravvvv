@@ -1,0 +1,56 @@
+services:
+  postgres-prod:
+    image: postgres:16-alpine
+    container_name: dairy-erp-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SudhaProdSecure@2026}
+      POSTGRES_DB: ${POSTGRES_DB:-dairy_erp_prod}
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dairy_erp_prod}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - dairy_erp_prod_data:/var/lib/postgresql/data
+
+  backend-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: dairy-erp-backend-api
+    restart: always
+    depends_on:
+      postgres-prod:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-SudhaProdSecure@2026}@postgres-prod:5432/${POSTGRES_DB:-dairy_erp_prod}
+      JWT_SECRET: ${JWT_SECRET:-SudhaProdJwtSecretKey@2026_ERP_Pro}
+      AUTH_ACCESS_TOKEN_TTL: 12h
+      AUTH_REFRESH_TOKEN_TTL_DAYS: 30
+      DEV_SEED_PASSWORD: ${DEV_SEED_PASSWORD:-Password@123}
+    ports:
+      - '4000:4000'
+
+  frontend-pwa:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: dairy-erp-frontend-pwa
+    restart: always
+    depends_on:
+      - backend-api
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/v1}
+    ports:
+      - '3000:3000'
+
+volumes:
+  dairy_erp_prod_data:

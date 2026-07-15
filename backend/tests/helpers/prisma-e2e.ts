@@ -151,6 +151,11 @@ export async function resetPrismaTestDb(prisma: PrismaClient) {
   await prisma.employee.deleteMany();
   await prisma.area.deleteMany();
   await prisma.retailer.deleteMany();
+  await prisma.userSession.deleteMany();
+  await prisma.userRole.deleteMany();
+  await prisma.rolePermission.deleteMany();
+  await prisma.role.deleteMany();
+  await prisma.permission.deleteMany();
   await prisma.user.deleteMany();
   await prisma.organization.deleteMany();
 }

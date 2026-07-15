@@ -1,0 +1,37 @@
+# Multi-stage production build for Dairy Distributor ERP Frontend (Next.js PWA)
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy root and frontend package configurations
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install dependencies cleanly
+RUN cd frontend && npm ci
+
+# Copy full frontend codebase
+COPY frontend ./frontend
+
+# Build Next.js production bundle
+RUN cd frontend && npm run build
+
+# Production runner stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Copy Next.js production build artifacts and dependencies
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/frontend/package*.json ./frontend/
+COPY --from=builder /app/frontend/.next ./frontend/.next
+COPY --from=builder /app/frontend/public ./frontend/public
+COPY --from=builder /app/frontend/node_modules ./frontend/node_modules
+
+EXPOSE 3000
+
+WORKDIR /app/frontend
+CMD ["npm", "run", "start"]
