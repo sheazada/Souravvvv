@@ -13,7 +13,8 @@ resolve_targets() {
         "typecheck" \
         "test:lookups" \
         "test:products" \
-        "test:operations"
+        "test:operations" \
+        "test:settings"
       ;;
     typecheck-products)
       printf '%s\n' "typecheck:products"
@@ -29,6 +30,9 @@ resolve_targets() {
       ;;
     operations)
       printf '%s\n' "test:operations"
+      ;;
+    settings)
+      printf '%s\n' "test:settings"
       ;;
     dispatch)
       printf '%s\n' "vitest run src/features/dispatch/components/__tests__"
