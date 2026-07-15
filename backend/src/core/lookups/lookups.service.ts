@@ -597,7 +597,7 @@ export class LookupsService {
     }
     return this.prisma.productCategory.findMany({
       where,
-      orderBy: [{ parentId: 'asc' }, { name: 'asc' }],
+      orderBy: [{ parentId: { sort: 'asc', nulls: 'first' } }, { name: 'asc' }],
       take: query.limit ?? 100,
       select: {
         id: true,

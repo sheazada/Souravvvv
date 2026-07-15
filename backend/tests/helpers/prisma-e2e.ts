@@ -109,6 +109,19 @@ export async function resetPrismaTestDb(prisma: PrismaClient) {
   await prisma.deliveryStop.deleteMany();
   await prisma.dispatchTripItem.deleteMany();
   await prisma.dispatchTrip.deleteMany();
+  await prisma.stockMovement.deleteMany();
+  await prisma.stockAdjustmentItem.deleteMany();
+  await prisma.stockAdjustment.deleteMany();
+  await prisma.purchaseInvoiceItem.deleteMany();
+  await prisma.purchaseInvoice.deleteMany();
+  await prisma.purchaseOrderItem.deleteMany();
+  await prisma.purchaseOrder.deleteMany();
+  await prisma.demandSourceOrder.deleteMany();
+  await prisma.demandConsolidationItem.deleteMany();
+  await prisma.demandConsolidation.deleteMany();
+  await prisma.inventoryBatch.deleteMany();
+  await prisma.goodsReceiptItem.deleteMany();
+  await prisma.goodsReceipt.deleteMany();
   await prisma.salesOrderStatusHistory.deleteMany();
   await prisma.salesOrderItem.deleteMany();
   await prisma.salesOrder.deleteMany();
@@ -130,6 +143,11 @@ export async function resetPrismaTestDb(prisma: PrismaClient) {
   await prisma.crateType.deleteMany();
   await prisma.deliveryCycle.deleteMany();
   await prisma.route.deleteMany();
+  await prisma.supplier.deleteMany();
+  await prisma.warehouse.deleteMany();
+  await prisma.vehicle.deleteMany();
+  await prisma.employee.deleteMany();
+  await prisma.area.deleteMany();
   await prisma.retailer.deleteMany();
   await prisma.user.deleteMany();
   await prisma.organization.deleteMany();
@@ -595,6 +613,28 @@ export async function seedCreditOpsFixture(prisma: PrismaClient, options?: {
       riskLevel: cfg.overdueAmount > 0 ? 'high' : 'medium',
     },
   });
+
+  if (cfg.currentOutstanding > 0) {
+    await prisma.salesInvoice.create({
+      data: {
+        id: IDS.invoice,
+        organizationId: IDS.org,
+        invoiceNo: 'INV-CREDIT-OPS-001',
+        retailerId: IDS.retailer,
+        invoiceDate: new Date('2026-07-01T00:00:00.000Z'),
+        dueDate: cfg.overdueAmount > 0 ? new Date('2026-06-15T00:00:00.000Z') : new Date('2026-08-01T00:00:00.000Z'),
+        source: 'assisted_billing',
+        createdByUserId: IDS.user,
+        status: 'posted',
+        paymentStatus: 'unpaid',
+        subtotal: cfg.currentOutstanding,
+        discountTotal: 0,
+        taxTotal: 0,
+        grandTotal: cfg.currentOutstanding,
+        outstandingAmount: cfg.currentOutstanding,
+      },
+    });
+  }
 
   await prisma.salesOrder.create({
     data: {

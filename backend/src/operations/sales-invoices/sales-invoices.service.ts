@@ -146,6 +146,11 @@ export class SalesInvoicesService {
       message: 'Sales invoice fetched successfully',
       data: {
         ...invoice,
+        grandTotal: this.toNumber(invoice.grandTotal),
+        outstandingAmount: this.toNumber(invoice.outstandingAmount),
+        discountTotal: this.toNumber(invoice.discountTotal),
+        taxTotal: this.toNumber(invoice.taxTotal),
+        subtotal: this.toNumber(invoice.subtotal),
         items: await this.enrichInvoiceItems(actor.organizationId, items),
         retailer,
         salesOrder,
@@ -473,6 +478,7 @@ export class SalesInvoicesService {
   async getRevisionHistory(actor: AuthenticatedUser, id: string) {
     this.assertAuthenticated(actor);
     const invoice = await this.getAccessibleInvoiceOrThrow(actor, id);
+    const baseInvoiceNo = invoice.invoiceNo.replace(/-R\d+$/, '');
 
     const related = await this.prisma.salesInvoice.findMany({
       where: {
@@ -481,6 +487,7 @@ export class SalesInvoicesService {
         OR: [
           ...(invoice.salesOrderId ? [{ salesOrderId: invoice.salesOrderId }] : []),
           ...(invoice.dispatchTripId ? [{ dispatchTripId: invoice.dispatchTripId }] : []),
+          { invoiceNo: { startsWith: baseInvoiceNo } },
           { id: invoice.id },
         ],
       },
