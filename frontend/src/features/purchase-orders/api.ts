@@ -3,10 +3,14 @@ import type { ApiSuccess, PaginatedApiSuccess } from '@/types/api';
 import type {
   CreatePurchaseOrderFromDemandPayload,
   CreatePurchaseOrderPayload,
+  PurchaseInvoiceDetail,
+  PurchaseInvoiceListItem,
   PurchaseOrderDetail,
   PurchaseOrderItem,
   PurchaseOrderListFilters,
   PurchaseOrderListItem,
+  SupplierReturnDetail,
+  SupplierReturnListItem,
   UpdatePurchaseOrderDemandExtrasPayload,
 } from '@/types/purchase-orders';
 
@@ -50,6 +54,60 @@ export const PurchaseOrdersApi = {
   },
   cancel(id: string) {
     return apiClient<ApiSuccess<PurchaseOrderDetail>>(`/purchase-orders/${id}/cancel`, {
+      method: 'POST',
+    });
+  },
+};
+
+export const PurchaseInvoicesApi = {
+  list(params?: Record<string, any>) {
+    return apiClient<PaginatedApiSuccess<PurchaseInvoiceListItem>>(
+      `/purchase-invoices${buildQueryString(params)}`,
+    );
+  },
+  getById(id: string) {
+    return apiClient<ApiSuccess<PurchaseInvoiceDetail>>(`/purchase-invoices/${id}`);
+  },
+  create(payload: Record<string, any>) {
+    return apiClient<ApiSuccess<PurchaseInvoiceDetail>>('/purchase-invoices', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  approve(id: string) {
+    return apiClient<ApiSuccess<PurchaseInvoiceDetail>>(`/purchase-invoices/${id}/approve`, {
+      method: 'POST',
+    });
+  },
+  post(id: string) {
+    return apiClient<ApiSuccess<PurchaseInvoiceDetail>>(`/purchase-invoices/${id}/post`, {
+      method: 'POST',
+    });
+  },
+};
+
+export const SupplierReturnsApi = {
+  list(params?: Record<string, any>) {
+    return apiClient<PaginatedApiSuccess<SupplierReturnListItem>>(
+      `/supplier-returns${buildQueryString(params)}`,
+    );
+  },
+  getById(id: string) {
+    return apiClient<ApiSuccess<SupplierReturnDetail>>(`/supplier-returns/${id}`);
+  },
+  create(payload: Record<string, any>) {
+    return apiClient<ApiSuccess<SupplierReturnDetail>>('/supplier-returns', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  approve(id: string) {
+    return apiClient<ApiSuccess<SupplierReturnDetail>>(`/supplier-returns/${id}/approve`, {
+      method: 'POST',
+    });
+  },
+  post(id: string) {
+    return apiClient<ApiSuccess<SupplierReturnDetail>>(`/supplier-returns/${id}/post`, {
       method: 'POST',
     });
   },

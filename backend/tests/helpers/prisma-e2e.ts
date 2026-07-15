@@ -114,6 +114,8 @@ export async function resetPrismaTestDb(prisma: PrismaClient) {
   await prisma.stockMovement.deleteMany();
   await prisma.stockAdjustmentItem.deleteMany();
   await prisma.stockAdjustment.deleteMany();
+  await prisma.supplierReturnItem.deleteMany();
+  await prisma.supplierReturn.deleteMany();
   await prisma.purchaseInvoiceItem.deleteMany();
   await prisma.purchaseInvoice.deleteMany();
   await prisma.purchaseOrderItem.deleteMany();
