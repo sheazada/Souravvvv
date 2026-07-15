@@ -1,0 +1,45 @@
+{
+  "name": "dairy-distributor-erp-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "typecheck:products": "tsc -p tsconfig.products.json --pretty false",
+    "test": "vitest run",
+    "test:products": "vitest run src/features/products/components/__tests__",
+    "test:lookups": "vitest run src/features/lookups/__tests__ src/components/ui/__tests__/lookup-input.test.tsx",
+    "test:operations": "vitest run src/features/goods-receipts/components/__tests__ src/features/purchase-orders/components/__tests__ src/features/dispatch/components/__tests__ src/features/inventory/components/__tests__"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.59.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "^15.0.0",
+    "next-themes": "^0.4.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.0",
+    "tailwind-merge": "^2.5.3",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.8.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

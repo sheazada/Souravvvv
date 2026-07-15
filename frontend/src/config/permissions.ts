@@ -1,0 +1,14 @@
+export const permissions = {
+  dashboardRead: 'dashboard.read',
+  retailersManage: 'retailers.manage',
+  productsManage: 'products.manage',
+  ordersManage: 'orders.manage',
+  assistedOrders: 'orders.assisted',
+  invoicesManage: 'invoices.manage',
+  procurementManage: 'procurement.manage',
+  inventoryManage: 'inventory.manage',
+  dispatchManage: 'dispatch.manage',
+  accountingManage: 'accounting.manage',
+  reportsRead: 'reports.read',
+  notificationsManage: 'notifications.manage',
+} as const;

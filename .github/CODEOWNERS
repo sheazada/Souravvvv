@@ -1,0 +1,23 @@
+# CODEOWNERS
+#
+# GitHub uses the last matching pattern in this file.
+# Replace or expand owners as your team grows.
+# Current default owner is the repository owner.
+
+# Default owner for the whole repository
+* @sheazada
+
+# Backend API, NestJS modules, tests, CI helpers
+/backend/ @sheazada
+
+# Frontend Next.js app and UI wiring
+/frontend/ @sheazada
+
+# Shared Prisma schema, seeds, and database assets
+/prisma/ @sheazada
+
+# GitHub workflows, issue templates, PR templates, labels, ownership
+/.github/ @sheazada
+
+# Root ERP planning and architecture docs
+/*.md @sheazada

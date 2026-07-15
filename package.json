@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "test:backend:prisma": "bash ./scripts/run-backend-prisma-suites.sh",
+    "test:backend:prisma:purchase-orders": "bash ./scripts/run-backend-prisma-suites.sh purchase-orders",
+    "test:frontend:ui": "bash ./scripts/run-frontend-ui-suites.sh",
+    "test:local:all": "bash ./scripts/run-all-local-checks.sh"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  }
+}

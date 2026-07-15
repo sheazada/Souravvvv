@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "tsBuildInfoFile": ".cache/tsconfig.products.tsbuildinfo",
+    "types": ["node", "react", "react-dom", "vitest/globals", "@testing-library/jest-dom"]
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/features/products/**/*.ts",
+    "src/features/products/**/*.tsx",
+    "src/types/products.ts",
+    "src/features/lookups/**/*.ts",
+    "src/features/lookups/**/*.tsx",
+    "src/types/lookups.ts",
+    "src/components/ui/lookup-input.tsx",
+    "src/components/ui/searchable-select.tsx",
+    "src/lib/api/client.ts",
+    "src/lib/utils/number.ts",
+    "src/lib/utils/title.ts",
+    "src/lib/utils/cn.ts",
+    "src/config/admin-route-permissions.ts",
+    "src/config/routes.ts",
+    "src/config/permissions.ts",
+    "src/types/api.ts",
+    "src/components/feedback/empty-state.tsx",
+    "src/components/ui/kpi-card.tsx",
+    "src/components/ui/page-header.tsx"
+  ],
+  "exclude": ["node_modules"]
+}

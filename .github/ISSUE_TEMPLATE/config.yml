@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Contribution guide
+    url: https://github.com/sheazada/DAIRY-FLOW-PRO/blob/main/CONTRIBUTING.md
+    about: Read project-specific contribution, CI, and testing guidance before opening an issue.
+  - name: Backend local CI and Prisma e2e guide
+    url: https://github.com/sheazada/DAIRY-FLOW-PRO/blob/main/backend/README.md
+    about: Use this guide for backend setup, local CI-equivalent runs, and Prisma-backed e2e testing.
+  - name: Frontend UI tests and workflow guide
+    url: https://github.com/sheazada/DAIRY-FLOW-PRO/blob/main/frontend/README.md
+    about: Use this guide for frontend test commands, UI coverage grouping, and the frontend-ui-tests workflow.

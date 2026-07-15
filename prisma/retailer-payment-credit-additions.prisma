@@ -1,0 +1,351 @@
+/// Supplemental Prisma schema additions for the Retailer Payment & Credit module.
+///
+/// How to use:
+/// 1. Merge the new models below into your main `prisma/schema.prisma`.
+/// 2. Apply the patch snippets to the existing models listed at the bottom.
+/// 3. Run `npx prisma format` and then validate/generate.
+///
+/// Notes:
+/// - This follows the existing schema style: String status/type fields instead of Prisma enums.
+/// - Generic `referenceType` + `referenceId` are kept where the source document may vary.
+/// - This is ledger-first: invoices/payments/notes should post into retailer ledger entries.
+
+model RetailerCreditProfile {
+  id                        String    @id @default(uuid()) @db.Uuid
+  organizationId            String    @db.Uuid
+  retailerId                String    @unique @db.Uuid
+  creditLimit               Decimal   @default(0) @db.Decimal(14, 2)
+  creditDays                Int       @default(0)
+  warningThresholdPercent   Decimal   @default(80.00) @db.Decimal(5, 2)
+  blockOrdersOnLimitExceed  Boolean   @default(false)
+  managerApprovalRequired   Boolean   @default(true)
+  allowDispatchWithOverdue  Boolean   @default(false)
+  availableCredit           Decimal   @default(0) @db.Decimal(14, 2)
+  usedCredit                Decimal   @default(0) @db.Decimal(14, 2)
+  currentOutstanding        Decimal   @default(0) @db.Decimal(14, 2)
+  overdueAmount             Decimal   @default(0) @db.Decimal(14, 2)
+  riskLevel                 String    @default("low") @db.VarChar(20)
+  averagePaymentDays        Decimal?  @db.Decimal(10, 2)
+  lastPaymentDate           DateTime? @db.Date
+  isCreditActive            Boolean   @default(true)
+  notes                     String?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  retailer Retailer @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, retailerId])
+  @@index([organizationId, riskLevel])
+}
+
+model RetailerLedgerEntry {
+  id                 String    @id @default(uuid()) @db.Uuid
+  organizationId     String    @db.Uuid
+  retailerId         String    @db.Uuid
+  entryNo            String    @db.VarChar(30)
+  entryDate          DateTime  @db.Date
+  entryTime          DateTime  @default(now())
+  transactionType    String    @db.VarChar(40)
+  referenceType      String    @db.VarChar(40)
+  referenceId        String?   @db.Uuid
+  invoiceId          String?   @db.Uuid
+  paymentReceiptId   String?   @db.Uuid
+  creditNoteId       String?   @db.Uuid
+  debitNoteId        String?   @db.Uuid
+  paymentMethod      String?   @db.VarChar(30)
+  debitAmount        Decimal   @default(0) @db.Decimal(14, 2)
+  creditAmount       Decimal   @default(0) @db.Decimal(14, 2)
+  runningBalance     Decimal   @default(0) @db.Decimal(14, 2)
+  allocationGroupId  String?   @db.Uuid
+  remarks            String?
+  createdByUserId    String?   @db.Uuid
+  createdAt          DateTime  @default(now())
+
+  retailer       Retailer        @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  invoice        SalesInvoice?   @relation("RetailerLedgerEntryInvoice", fields: [invoiceId], references: [id], onDelete: SetNull)
+  paymentReceipt PaymentReceipt? @relation("RetailerLedgerEntryPaymentReceipt", fields: [paymentReceiptId], references: [id], onDelete: SetNull)
+  creditNote     CreditNote?     @relation("RetailerLedgerEntryCreditNote", fields: [creditNoteId], references: [id], onDelete: SetNull)
+  debitNote      RetailerDebitNote? @relation("RetailerLedgerEntryDebitNote", fields: [debitNoteId], references: [id], onDelete: SetNull)
+  createdBy      User?           @relation("RetailerLedgerEntryCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, entryNo])
+  @@index([organizationId, retailerId, entryDate, entryTime])
+  @@index([organizationId, transactionType])
+  @@index([organizationId, referenceType, referenceId])
+}
+
+model RetailerPaymentIntent {
+  id                String    @id @default(uuid()) @db.Uuid
+  organizationId    String    @db.Uuid
+  retailerId        String    @db.Uuid
+  intentNo          String    @db.VarChar(30)
+  paymentContext    String    @db.VarChar(30)
+  currencyCode      String    @default("INR") @db.VarChar(10)
+  amount            Decimal   @db.Decimal(14, 2)
+  gatewayName       String?   @db.VarChar(50)
+  gatewayOrderId    String?   @db.VarChar(100)
+  gatewayPaymentId  String?   @db.VarChar(100)
+  gatewaySignature  String?   @db.VarChar(255)
+  paymentLinkUrl    String?
+  dynamicQrPayload  String?
+  status            String    @default("initiated") @db.VarChar(30)
+  failureReason     String?
+  initiatedAt       DateTime  @default(now())
+  completedAt       DateTime?
+  expiresAt         DateTime?
+  createdByUserId   String?   @db.Uuid
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  retailer       Retailer                     @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  createdBy      User?                        @relation("RetailerPaymentIntentCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  invoiceLinks   RetailerPaymentIntentInvoice[]
+  paymentReceipts PaymentReceipt[]            @relation("RetailerPaymentIntentPaymentReceipt")
+
+  @@unique([organizationId, intentNo])
+  @@index([organizationId, retailerId, status])
+  @@index([organizationId, gatewayOrderId])
+  @@index([organizationId, gatewayPaymentId])
+}
+
+model RetailerPaymentIntentInvoice {
+  paymentIntentId String   @db.Uuid
+  salesInvoiceId  String   @db.Uuid
+  targetAmount    Decimal  @db.Decimal(14, 2)
+  createdAt       DateTime @default(now())
+
+  paymentIntent RetailerPaymentIntent @relation(fields: [paymentIntentId], references: [id], onDelete: Cascade)
+  salesInvoice  SalesInvoice          @relation(fields: [salesInvoiceId], references: [id], onDelete: Cascade)
+
+  @@id([paymentIntentId, salesInvoiceId])
+  @@index([salesInvoiceId])
+}
+
+model RetailerAdvanceWallet {
+  id               String    @id @default(uuid()) @db.Uuid
+  organizationId   String    @db.Uuid
+  retailerId       String    @unique @db.Uuid
+  availableBalance Decimal   @default(0) @db.Decimal(14, 2)
+  lockedBalance    Decimal   @default(0) @db.Decimal(14, 2)
+  lastUpdatedAt    DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  retailer     Retailer                  @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  transactions RetailerWalletTransaction[]
+
+  @@index([organizationId, retailerId])
+}
+
+model RetailerWalletTransaction {
+  id                   String   @id @default(uuid()) @db.Uuid
+  organizationId       String   @db.Uuid
+  retailerAdvanceWalletId String @db.Uuid
+  transactionType      String   @db.VarChar(30)
+  referenceType        String?  @db.VarChar(40)
+  referenceId          String?  @db.Uuid
+  debitAmount          Decimal  @default(0) @db.Decimal(14, 2)
+  creditAmount         Decimal  @default(0) @db.Decimal(14, 2)
+  runningWalletBalance Decimal  @default(0) @db.Decimal(14, 2)
+  remarks              String?
+  createdAt            DateTime @default(now())
+
+  wallet RetailerAdvanceWallet @relation(fields: [retailerAdvanceWalletId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, retailerAdvanceWalletId, createdAt])
+}
+
+model RetailerCreditOverride {
+  id                String    @id @default(uuid()) @db.Uuid
+  organizationId    String    @db.Uuid
+  retailerId        String    @db.Uuid
+  salesOrderId      String?   @db.Uuid
+  overrideType      String    @db.VarChar(30)
+  requestedAmount   Decimal?  @db.Decimal(14, 2)
+  approvedAmount    Decimal?  @db.Decimal(14, 2)
+  reason            String
+  status            String    @default("approved") @db.VarChar(20)
+  approvedByUserId  String    @db.Uuid
+  approvedAt        DateTime  @default(now())
+  expiresAt         DateTime?
+  remarks           String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  retailer   Retailer   @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  salesOrder  SalesOrder? @relation(fields: [salesOrderId], references: [id], onDelete: SetNull)
+  approvedBy User       @relation("RetailerCreditOverrideApprovedBy", fields: [approvedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, retailerId, approvedAt])
+  @@index([organizationId, salesOrderId])
+}
+
+model RetailerPaymentReminder {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @db.Uuid
+  retailerId     String    @db.Uuid
+  salesInvoiceId String    @db.Uuid
+  reminderStage  String    @db.VarChar(30)
+  channel        String    @db.VarChar(20)
+  scheduledAt    DateTime
+  sentAt         DateTime?
+  status         String    @default("pending") @db.VarChar(20)
+  templateId     String?   @db.Uuid
+  errorMessage   String?
+  createdAt      DateTime  @default(now())
+
+  retailer    Retailer             @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  salesInvoice SalesInvoice        @relation(fields: [salesInvoiceId], references: [id], onDelete: Cascade)
+  template    NotificationTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, scheduledAt, status])
+  @@index([organizationId, retailerId, salesInvoiceId])
+}
+
+model RetailerPaymentMetric {
+  id                    String    @id @default(uuid()) @db.Uuid
+  organizationId        String    @db.Uuid
+  retailerId            String    @unique @db.Uuid
+  currentOutstanding    Decimal   @default(0) @db.Decimal(14, 2)
+  overdueAmount         Decimal   @default(0) @db.Decimal(14, 2)
+  pendingInvoiceCount   Int       @default(0)
+  lastPaymentDate       DateTime? @db.Date
+  averagePaymentDays    Decimal?  @db.Decimal(10, 2)
+  collectionSuccessRate Decimal?  @db.Decimal(5, 2)
+  riskScore             Decimal?  @db.Decimal(10, 2)
+  riskLevel             String    @default("low") @db.VarChar(20)
+  updatedAt             DateTime  @default(now()) @updatedAt
+
+  retailer Retailer @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, riskLevel])
+  @@index([organizationId, overdueAmount])
+}
+
+model PaymentGatewayWebhook {
+  id                 String    @id @default(uuid()) @db.Uuid
+  organizationId     String    @db.Uuid
+  gatewayName        String    @db.VarChar(50)
+  eventType          String    @db.VarChar(100)
+  externalReference  String?   @db.VarChar(100)
+  payloadJson        Json
+  signature          String?   @db.VarChar(255)
+  verificationStatus String    @default("pending") @db.VarChar(20)
+  processedStatus    String    @default("pending") @db.VarChar(20)
+  processedAt        DateTime?
+  errorMessage       String?
+  createdAt          DateTime  @default(now())
+
+  @@index([gatewayName, externalReference])
+  @@index([processedStatus, createdAt])
+}
+
+model RetailerDebitNote {
+  id                   String    @id @default(uuid()) @db.Uuid
+  organizationId       String    @db.Uuid
+  debitNoteNo          String    @db.VarChar(30)
+  retailerId           String    @db.Uuid
+  relatedInvoiceId     String?   @db.Uuid
+  noteDate             DateTime  @db.Date
+  amount               Decimal   @db.Decimal(14, 2)
+  affectsLedger        Boolean   @default(true)
+  affectsInvoiceBalance Boolean  @default(true)
+  appliedAmount        Decimal   @default(0) @db.Decimal(14, 2)
+  remainingAmount      Decimal   @default(0) @db.Decimal(14, 2)
+  status               String    @default("posted") @db.VarChar(20)
+  remarks              String?
+  journalEntryId       String?   @db.Uuid
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  retailer      Retailer             @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  relatedInvoice SalesInvoice?       @relation("RetailerDebitNoteInvoice", fields: [relatedInvoiceId], references: [id], onDelete: SetNull)
+  ledgerEntries  RetailerLedgerEntry[] @relation("RetailerLedgerEntryDebitNote")
+
+  @@unique([organizationId, debitNoteNo])
+  @@index([organizationId, retailerId, noteDate])
+}
+
+/// ----------------------------------------------------------------------
+/// PATCH SNIPPETS FOR EXISTING MODELS
+/// Merge the following fields into your existing models in schema.prisma.
+/// ----------------------------------------------------------------------
+
+/// PATCH EXISTING MODEL: User
+/// Add these relation fields:
+///
+/// retailerLedgerEntriesCreated RetailerLedgerEntry[] @relation("RetailerLedgerEntryCreatedBy")
+/// retailerPaymentIntentsCreated RetailerPaymentIntent[] @relation("RetailerPaymentIntentCreatedBy")
+/// retailerCreditOverridesApproved RetailerCreditOverride[] @relation("RetailerCreditOverrideApprovedBy")
+
+/// PATCH EXISTING MODEL: Retailer
+/// Add these relation fields:
+///
+/// creditProfile      RetailerCreditProfile?
+/// ledgerEntries      RetailerLedgerEntry[]
+/// paymentIntents     RetailerPaymentIntent[]
+/// advanceWallet      RetailerAdvanceWallet?
+/// creditOverrides    RetailerCreditOverride[]
+/// paymentReminders   RetailerPaymentReminder[]
+/// paymentMetric      RetailerPaymentMetric?
+/// debitNotes         RetailerDebitNote[]
+
+/// PATCH EXISTING MODEL: SalesInvoice
+/// Add these scalar fields:
+///
+/// paymentStatus   String   @default("unpaid") @db.VarChar(20)
+/// paidAt          DateTime?
+/// dueBucket       String?  @db.VarChar(20)
+/// paymentIntentId String?  @db.Uuid
+/// autoReconciled  Boolean  @default(false)
+/// reminderEnabled Boolean  @default(true)
+///
+/// Add these relation fields:
+///
+/// retailerLedgerEntries RetailerLedgerEntry[]      @relation("RetailerLedgerEntryInvoice")
+/// paymentIntentLinks    RetailerPaymentIntentInvoice[]
+/// paymentReminders      RetailerPaymentReminder[]
+/// debitNotes            RetailerDebitNote[]        @relation("RetailerDebitNoteInvoice")
+
+/// PATCH EXISTING MODEL: PaymentReceipt
+/// Add these scalar fields:
+///
+/// paymentSource      String?  @db.VarChar(30)
+/// paymentIntentId    String?  @db.Uuid
+/// gatewayName        String?  @db.VarChar(50)
+/// gatewayPaymentId   String?  @db.VarChar(100)
+/// gatewayOrderId     String?  @db.VarChar(100)
+/// isAdvancePayment   Boolean  @default(false)
+/// unallocatedAmount  Decimal  @default(0) @db.Decimal(14, 2)
+/// receiptFileUrl     String?
+/// signatureFileUrl   String?
+/// autoReconciled     Boolean  @default(false)
+///
+/// Add these relation fields:
+///
+/// retailerLedgerEntries RetailerLedgerEntry[] @relation("RetailerLedgerEntryPaymentReceipt")
+/// paymentIntent         RetailerPaymentIntent? @relation("RetailerPaymentIntentPaymentReceipt", fields: [paymentIntentId], references: [id], onDelete: SetNull)
+
+/// PATCH EXISTING MODEL: CreditNote
+/// Add these scalar fields:
+///
+/// retailerId            String?  @db.Uuid
+/// affectsLedger         Boolean  @default(true)
+/// affectsInvoiceBalance Boolean  @default(true)
+/// appliedAmount         Decimal  @default(0) @db.Decimal(14, 2)
+/// remainingAmount       Decimal  @default(0) @db.Decimal(14, 2)
+///
+/// Add these relation fields:
+///
+/// retailer      Retailer?              @relation(fields: [retailerId], references: [id], onDelete: SetNull)
+/// ledgerEntries RetailerLedgerEntry[]  @relation("RetailerLedgerEntryCreditNote")
+
+/// PATCH EXISTING MODEL: SalesOrder
+/// Add these relation fields:
+///
+/// creditOverrides RetailerCreditOverride[]
+
+/// PATCH EXISTING MODEL: NotificationTemplate
+/// Add these relation fields:
+///
+/// retailerPaymentReminders RetailerPaymentReminder[]

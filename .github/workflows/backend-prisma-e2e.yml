@@ -1,0 +1,94 @@
+name: Backend CI + Prisma E2E
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - 'prisma/**'
+      - '.github/workflows/backend-prisma-e2e.yml'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'prisma/**'
+      - '.github/workflows/backend-prisma-e2e.yml'
+  workflow_dispatch:
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dairy_erp_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d dairy_erp_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    defaults:
+      run:
+        working-directory: backend
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Load backend test profile
+        run: |
+          set -a
+          source .env.test
+          set +a
+          {
+            echo "DATABASE_URL=$DATABASE_URL"
+            echo "TEST_DATABASE_URL=$TEST_DATABASE_URL"
+            echo "JWT_SECRET=$JWT_SECRET"
+            echo "AUTH_ACCESS_TOKEN_TTL=$AUTH_ACCESS_TOKEN_TTL"
+            echo "AUTH_REFRESH_TOKEN_TTL_DAYS=$AUTH_REFRESH_TOKEN_TTL_DAYS"
+            echo "DEV_SEED_PASSWORD=$DEV_SEED_PASSWORD"
+            echo "PAYMENT_GATEWAY_RAZORPAY_WEBHOOK_SECRET=$PAYMENT_GATEWAY_RAZORPAY_WEBHOOK_SECRET"
+            echo "RETAILER_NOTE_THRESHOLD_CACHE_TTL_MS=$RETAILER_NOTE_THRESHOLD_CACHE_TTL_MS"
+            echo "RETAILER_CREDIT_NOTE_MAX_AMOUNT=$RETAILER_CREDIT_NOTE_MAX_AMOUNT"
+            echo "RETAILER_CREDIT_NOTE_MAX_TAX_AMOUNT=$RETAILER_CREDIT_NOTE_MAX_TAX_AMOUNT"
+            echo "RETAILER_CREDIT_NOTE_MAX_TOTAL_AMOUNT=$RETAILER_CREDIT_NOTE_MAX_TOTAL_AMOUNT"
+            echo "RETAILER_DEBIT_NOTE_MAX_AMOUNT=$RETAILER_DEBIT_NOTE_MAX_AMOUNT"
+          } >> "$GITHUB_ENV"
+
+      - name: Install backend dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+
+      - name: Lint / TypeScript compile check
+        run: npm run lint
+
+      - name: Build Nest backend
+        run: npm run build
+
+      - name: Run service/integration tests
+        run: |
+          npm run test:credit-control
+          npm run test:products-service
+          npm run test:payments-integration
+          npm run test:credit-ops-integration
+
+      - name: Run mocked HTTP e2e tests
+        run: npm run test:e2e:http
+
+      - name: Run Prisma-backed HTTP e2e tests
+        run: npm run test:e2e:prisma:http
