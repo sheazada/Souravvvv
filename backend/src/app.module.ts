@@ -11,6 +11,7 @@ import { OrganizationModule } from './core/organization/organization.module';
 import { SettingsModule } from './core/settings/settings.module';
 import { DashboardModule } from './core/dashboard/dashboard.module';
 import { LookupsModule } from './core/lookups/lookups.module';
+import { AuditModule } from './core/audit/audit.module';
 import { AreasModule } from './masters/areas/areas.module';
 import { RoutesModule } from './masters/routes/routes.module';
 import { EmployeesModule } from './masters/employees/employees.module';
@@ -55,6 +56,7 @@ import { AiModule } from './integrations/ai/ai.module';
     SettingsModule,
     DashboardModule,
     LookupsModule,
+    AuditModule,
     AreasModule,
     RoutesModule,
     EmployeesModule,
