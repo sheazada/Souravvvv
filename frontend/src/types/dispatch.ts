@@ -1,3 +1,53 @@
+export type CrateTransactionListItem = {
+  id: string;
+  crateTypeId: string;
+  retailerId?: string | null;
+  dispatchTripId?: string | null;
+  transactionType: 'issue' | 'return' | 'damage' | 'missing' | 'adjustment';
+  quantity: number;
+  transactionDate: string;
+  referenceType?: string | null;
+  remarks?: string | null;
+  crateType?: {
+    id: string;
+    code: string;
+    name: string;
+    depositValue?: number | string | null;
+  } | null;
+  retailer?: {
+    id: string;
+    retailerCode?: string | null;
+    shopName: string;
+  } | null;
+};
+
+export type CrateBalanceSnapshotListItem = {
+  id: string;
+  balanceDate: string;
+  retailerId: string;
+  crateTypeId: string;
+  openingQty: number;
+  issuedQty: number;
+  returnedQty: number;
+  damagedQty: number;
+  missingQty: number;
+  closingQty: number;
+  depositRate?: number;
+  totalLiability?: number;
+  crateType?: {
+    id: string;
+    code: string;
+    name: string;
+    depositValue?: number | string | null;
+  } | null;
+  retailer?: {
+    id: string;
+    retailerCode?: string | null;
+    shopName: string;
+    mobile?: string | null;
+  } | null;
+};
+
 export type DispatchTripListItem = {
   id: string;
   tripNo: string;

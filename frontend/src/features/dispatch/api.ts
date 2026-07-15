@@ -2,6 +2,8 @@ import { apiClient, buildQueryString } from '@/lib/api/client';
 import type { ApiSuccess, PaginatedApiSuccess } from '@/types/api';
 import type {
   AssignDispatchResourcesPayload,
+  CrateBalanceSnapshotListItem,
+  CrateTransactionListItem,
   DispatchStopSummary,
   DispatchTripDetail,
   DispatchTripFilters,
@@ -71,5 +73,30 @@ export const DispatchApi = {
     return apiClient<ApiSuccess<{ challan: NonNullable<DispatchTripDetail['challan']>; trip: DispatchTripDetail }>>(
       `/dispatch-trips/${id}/challan`,
     );
+  },
+};
+
+export const CratesApi = {
+  listTransactions(params?: Record<string, any>) {
+    return apiClient<PaginatedApiSuccess<CrateTransactionListItem>>(
+      `/crates/transactions${buildQueryString(params)}`,
+    );
+  },
+  listBalances(params?: Record<string, any>) {
+    return apiClient<PaginatedApiSuccess<CrateBalanceSnapshotListItem>>(
+      `/crates/balances${buildQueryString(params)}`,
+    );
+  },
+  createTransaction(payload: Record<string, any>) {
+    return apiClient<ApiSuccess<CrateTransactionListItem>>('/crates/transactions', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  recalculateBalances(retailerId?: string, targetDate?: string) {
+    return apiClient<ApiSuccess<null>>('/crates/balances/recalculate', {
+      method: 'POST',
+      body: JSON.stringify({ retailerId, targetDate }),
+    });
   },
 };
