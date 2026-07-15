@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -11,6 +13,7 @@ import { createHash } from 'crypto';
 import { AuthenticatedUser } from '../../common/interfaces/authenticated-user.interface';
 import { PaymentsService } from '../payments/payments.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { SalesInvoicesService } from '../sales-invoices/sales-invoices.service';
 import {
   CreateCollectionEntryDto,
   CreateCrateEntryDto,
@@ -23,6 +26,8 @@ export class DeliveryService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly paymentsService: PaymentsService,
+    @Inject(forwardRef(() => SalesInvoicesService))
+    private readonly salesInvoicesService?: SalesInvoicesService,
   ) {}
 
   async getStop(actor: AuthenticatedUser, id: string) {
@@ -145,6 +150,47 @@ export class DeliveryService {
         }
       }
     });
+
+    if (this.salesInvoicesService) {
+      const invoices = await this.prisma.salesInvoice.findMany({
+        where: {
+          organizationId: actor.organizationId,
+          retailerId: stop.retailerId,
+          status: { in: ['draft', 'posted'] },
+          paymentStatus: 'unpaid',
+          OR: [
+            ...(stop.salesOrderId ? [{ salesOrderId: stop.salesOrderId }] : []),
+            { dispatchTripId: stop.dispatchTripId },
+          ],
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      for (const invoice of invoices) {
+        if (dto.status === 'failed' || dto.status === 'refused') {
+          try {
+            await this.salesInvoicesService.cancel(actor, invoice.id);
+          } catch {
+            // Ignore if cannot cancel (e.g. allocated payments)
+          }
+        } else if (dto.status === 'partial' || dto.status === 'delivered') {
+          try {
+            await this.salesInvoicesService.recomputeFromDelivery(actor, invoice.id, {
+              reason: `Recomputed upon delivery stop status ${dto.status}`,
+              applyImmediately: true,
+            });
+          } catch {
+            if (dto.status === 'partial') {
+              try {
+                await this.salesInvoicesService.cancel(actor, invoice.id);
+              } catch {
+                // Ignore
+              }
+            }
+          }
+        }
+      }
+    }
 
     return this.getStop(actor, id);
   }

@@ -15,6 +15,10 @@ export class QueryCreditNotesDto extends PaginationQueryDto {
   relatedInvoiceId?: string;
 
   @IsOptional()
+  @IsUUID()
+  relatedReturnId?: string;
+
+  @IsOptional()
   @IsString()
   status?: string;
 

@@ -1188,6 +1188,7 @@ model SalesInvoice {
   paymentIntentLinks    RetailerPaymentIntentInvoice[]
   paymentReminders      RetailerPaymentReminder[]
   debitNotes            RetailerDebitNote[]          @relation("RetailerDebitNoteInvoice")
+  creditNotes           CreditNote[]                 @relation("CreditNoteInvoice")
 
   @@unique([organizationId, invoiceNo])
   @@index([organizationId, retailerId, invoiceDate])
@@ -1294,8 +1295,10 @@ model CreditNote {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  retailer      Retailer?             @relation(fields: [retailerId], references: [id], onDelete: SetNull)
-  ledgerEntries RetailerLedgerEntry[] @relation("RetailerLedgerEntryCreditNote")
+  retailer       Retailer?             @relation(fields: [retailerId], references: [id], onDelete: SetNull)
+  relatedInvoice SalesInvoice?         @relation("CreditNoteInvoice", fields: [relatedInvoiceId], references: [id], onDelete: SetNull)
+  relatedReturn  SalesReturn?          @relation("CreditNoteReturn", fields: [relatedReturnId], references: [id], onDelete: SetNull)
+  ledgerEntries  RetailerLedgerEntry[] @relation("RetailerLedgerEntryCreditNote")
 
   @@unique([organizationId, creditNoteNo])
   @@index([organizationId, partyType, partyId, noteDate])
@@ -1318,6 +1321,7 @@ model SalesReturn {
   updatedAt        DateTime           @updatedAt
 
   items SalesReturnItem[]
+  creditNotes CreditNote[] @relation("CreditNoteReturn")
 
   @@unique([organizationId, returnNo])
   @@index([organizationId, retailerId, returnDate])

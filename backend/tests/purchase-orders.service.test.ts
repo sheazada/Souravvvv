@@ -4,20 +4,27 @@ import { BadRequestException } from '@nestjs/common';
 import { PurchaseOrdersService } from '../src/operations/purchase-orders/purchase-orders.service';
 
 function createService() {
+  const allVariants = [
+    {
+      id: 'var-1',
+      distributorPrice: 20,
+      product: { taxCodeId: 'tax-1' },
+    },
+    {
+      id: 'var-2',
+      distributorPrice: 30,
+      product: { taxCodeId: null },
+    },
+  ];
+
   const prisma = {
     productVariant: {
-      findMany: async () => [
-        {
-          id: 'var-1',
-          distributorPrice: 20,
-          product: { taxCodeId: 'tax-1' },
-        },
-        {
-          id: 'var-2',
-          distributorPrice: 30,
-          product: { taxCodeId: null },
-        },
-      ],
+      findMany: async ({ where }: any = {}) => {
+        if (where?.id?.in) {
+          return allVariants.filter((v) => where.id.in.includes(v.id));
+        }
+        return allVariants;
+      },
     },
     taxCode: {
       findMany: async () => [{ id: 'tax-1', gstRate: 5 }],
@@ -179,7 +186,52 @@ test('prepareDemandItems applies supplier-side extra procurement beyond consolid
   assert.equal(result.grandTotal, 412.5);
 });
 
-test('prepareDemandItems rejects extra procurement variants outside the demand consolidation', async () => {
+test('prepareDemandItems allows manual extra procurement quantity for variants outside the demand consolidation', async () => {
+  const service = createService() as any;
+
+  const result = await service.prepareDemandItems(
+    'org-1',
+    [
+      {
+        variantId: 'var-1',
+        finalProcurementQty: 10,
+      },
+    ],
+    [
+      {
+        variantId: 'var-2',
+        extraQty: 5,
+      },
+    ],
+  );
+
+  assert.equal(result.items.length, 2);
+  assert.deepEqual(result.items[0], {
+    variantId: 'var-1',
+    orderedQty: 10,
+    demandQty: 10,
+    extraQty: 0,
+    unitCost: 20,
+    taxRate: 5,
+    taxAmount: 10,
+    lineTotal: 210,
+  });
+  assert.deepEqual(result.items[1], {
+    variantId: 'var-2',
+    orderedQty: 5,
+    demandQty: 0,
+    extraQty: 5,
+    unitCost: 30,
+    taxRate: 0,
+    taxAmount: 0,
+    lineTotal: 150,
+  });
+  assert.equal(result.subtotal, 350);
+  assert.equal(result.taxTotal, 10);
+  assert.equal(result.grandTotal, 360);
+});
+
+test('prepareDemandItems rejects invalid or inactive extra procurement variants', async () => {
   const service = createService() as any;
 
   await assert.rejects(
@@ -201,7 +253,7 @@ test('prepareDemandItems rejects extra procurement variants outside the demand c
       ),
     (error: any) => {
       assert.equal(error instanceof BadRequestException, true);
-      assert.equal(error.message, 'Extra procurement item must belong to the demand consolidation');
+      assert.equal(error.message, 'One or more extra procurement variants are invalid or inactive');
       return true;
     },
   );
@@ -238,7 +290,8 @@ test('prepareDemandItems rejects negative extra procurement quantity', async () 
 test('prepareDemandExtraUpdates preserves demand qty and pricing while updating only extra qty', async () => {
   const service = createService() as any;
 
-  const result = service.prepareDemandExtraUpdates(
+  const result = await service.prepareDemandExtraUpdates(
+    'org-1',
     [
       {
         variantId: 'var-1',
@@ -290,12 +343,49 @@ test('prepareDemandExtraUpdates preserves demand qty and pricing while updating 
   assert.equal(result.grandTotal, 465);
 });
 
-test('prepareDemandExtraUpdates rejects non-po variants', async () => {
+test('prepareDemandExtraUpdates allows adding new extra variants not in the original PO (and rejects invalid/inactive variants)', async () => {
   const service = createService() as any;
 
-  assert.throws(
+  const result = await service.prepareDemandExtraUpdates(
+    'org-1',
+    [
+      {
+        variantId: 'var-1',
+        orderedQty: 12,
+        demandQty: 10,
+        extraQty: 2,
+        unitCost: 20,
+        taxRate: 5,
+      },
+    ],
+    [
+      {
+        variantId: 'var-1',
+        extraQty: 4,
+      },
+      {
+        variantId: 'var-2',
+        extraQty: 3,
+      },
+    ],
+  );
+
+  assert.equal(result.items.length, 2);
+  assert.deepEqual(result.items[1], {
+    variantId: 'var-2',
+    orderedQty: 3,
+    demandQty: 0,
+    extraQty: 3,
+    unitCost: 30,
+    taxRate: 0,
+    taxAmount: 0,
+    lineTotal: 90,
+  });
+
+  await assert.rejects(
     () =>
       service.prepareDemandExtraUpdates(
+        'org-1',
         [
           {
             variantId: 'var-1',
@@ -315,7 +405,7 @@ test('prepareDemandExtraUpdates rejects non-po variants', async () => {
       ),
     (error: any) => {
       assert.equal(error instanceof BadRequestException, true);
-      assert.equal(error.message, 'Extra procurement item must belong to the purchase order');
+      assert.equal(error.message, 'One or more extra procurement variants are invalid or inactive');
       return true;
     },
   );

@@ -23,6 +23,10 @@ export class CreateRetailerCreditNoteDto {
   @IsUUID()
   relatedInvoiceId?: string;
 
+  @IsOptional()
+  @IsUUID()
+  relatedReturnId?: string;
+
   @IsDateString()
   noteDate!: string;
 

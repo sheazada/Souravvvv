@@ -40,17 +40,8 @@ export class RetailerCreditNotesService {
     };
 
     if (query.retailerId) where.retailerId = query.retailerId;
-    if (query.relatedInvoiceId) {
-      where.AND = [
-        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
-        {
-          OR: [
-            { relatedInvoiceId: query.relatedInvoiceId },
-            { relatedReturnId: query.relatedInvoiceId },
-          ],
-        },
-      ];
-    }
+    if (query.relatedInvoiceId) where.relatedInvoiceId = query.relatedInvoiceId;
+    if (query.relatedReturnId) where.relatedReturnId = query.relatedReturnId;
     if (query.status) where.status = query.status;
     if (query.fromDate || query.toDate) {
       where.noteDate = {};
@@ -129,6 +120,9 @@ export class RetailerCreditNotesService {
     if (dto.relatedInvoiceId) {
       await this.getInvoiceForRetailerOrThrow(actor.organizationId, dto.retailerId, dto.relatedInvoiceId);
     }
+    if (dto.relatedReturnId) {
+      await this.getReturnForRetailerOrThrow(actor.organizationId, dto.retailerId, dto.relatedReturnId);
+    }
 
     const creditNoteNo = await this.generateCreditNoteNo(actor.organizationId);
     const totalImpact = this.totalImpact(dto.amount, dto.taxAmount);
@@ -141,7 +135,7 @@ export class RetailerCreditNotesService {
         partyId: dto.partyId,
         retailerId: dto.retailerId,
         relatedInvoiceId: dto.relatedInvoiceId ?? null,
-        relatedReturnId: null,
+        relatedReturnId: dto.relatedReturnId ?? null,
         noteDate: new Date(dto.noteDate),
         amount: dto.amount,
         taxAmount: dto.taxAmount ?? 0,
@@ -433,17 +427,8 @@ export class RetailerCreditNotesService {
       retailerId: actor.retailerId ?? undefined,
     };
 
-    if (query.relatedInvoiceId) {
-      where.AND = [
-        ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
-        {
-          OR: [
-            { relatedInvoiceId: query.relatedInvoiceId },
-            { relatedReturnId: query.relatedInvoiceId },
-          ],
-        },
-      ];
-    }
+    if (query.relatedInvoiceId) where.relatedInvoiceId = query.relatedInvoiceId;
+    if (query.relatedReturnId) where.relatedReturnId = query.relatedReturnId;
     if (query.status) where.status = query.status;
     if (query.fromDate || query.toDate) {
       where.noteDate = {};
@@ -544,8 +529,20 @@ export class RetailerCreditNotesService {
   }
 
 
-  private getRelatedInvoiceId(note: Pick<CreditNote, 'relatedInvoiceId' | 'relatedReturnId'>) {
-    return note.relatedInvoiceId ?? note.relatedReturnId ?? null;
+  private getRelatedInvoiceId(note: Pick<CreditNote, 'relatedInvoiceId'>) {
+    return note.relatedInvoiceId ?? null;
+  }
+
+  private async getReturnForRetailerOrThrow(
+    organizationId: string,
+    retailerId: string,
+    returnId: string,
+  ) {
+    const salesReturn = await this.prisma.salesReturn.findFirst({
+      where: { organizationId, retailerId, id: returnId },
+    });
+    if (!salesReturn) throw new NotFoundException('Related return not found');
+    return salesReturn;
   }
 
   private async getCreditNoteOrThrow(organizationId: string, id: string) {

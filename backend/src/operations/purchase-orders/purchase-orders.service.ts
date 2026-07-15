@@ -521,7 +521,11 @@ export class PurchaseOrdersService {
       throw new BadRequestException('Purchase order has no items to update');
     }
 
-    const prepared = this.prepareDemandExtraUpdates(existingItems, dto.items);
+    const prepared = await this.prepareDemandExtraUpdates(
+      actor.organizationId,
+      existingItems,
+      dto.items,
+    );
     const changedItems = prepared.items
       .map((item) => {
         const existing = existingItems.find((row) => row.variantId === item.variantId);
@@ -547,19 +551,37 @@ export class PurchaseOrdersService {
       });
 
       for (const item of prepared.items) {
-        await tx.purchaseOrderItem.updateMany({
-          where: {
-            organizationId: actor.organizationId,
-            purchaseOrderId: id,
-            variantId: item.variantId,
-          },
-          data: {
-            orderedQty: item.orderedQty,
-            extraQty: item.extraQty,
-            taxAmount: item.taxAmount,
-            lineTotal: item.lineTotal,
-          },
-        });
+        const existed = existingItems.some((row) => row.variantId === item.variantId);
+        if (existed) {
+          await tx.purchaseOrderItem.updateMany({
+            where: {
+              organizationId: actor.organizationId,
+              purchaseOrderId: id,
+              variantId: item.variantId,
+            },
+            data: {
+              orderedQty: item.orderedQty,
+              extraQty: item.extraQty,
+              taxAmount: item.taxAmount,
+              lineTotal: item.lineTotal,
+            },
+          });
+        } else {
+          await tx.purchaseOrderItem.create({
+            data: {
+              organizationId: actor.organizationId,
+              purchaseOrderId: id,
+              variantId: item.variantId,
+              orderedQty: item.orderedQty,
+              demandQty: item.demandQty,
+              extraQty: item.extraQty,
+              unitCost: item.unitCost,
+              taxRate: item.taxRate,
+              taxAmount: item.taxAmount,
+              lineTotal: item.lineTotal,
+            },
+          });
+        }
       }
 
       if (changedItems.length) {
@@ -727,7 +749,7 @@ export class PurchaseOrdersService {
     items: DemandConsolidationItem[],
     extraItems?: Array<{ variantId: string; extraQty?: number }>,
   ): Promise<PreparedPurchaseOrderPayload> {
-    const variantIds = [...new Set(items.map((item) => item.variantId))];
+    const baseVariantIds = new Set(items.map((item) => item.variantId));
     const extraMap = new Map<string, number>();
 
     for (const item of extraItems ?? []) {
@@ -738,16 +760,15 @@ export class PurchaseOrdersService {
       extraMap.set(item.variantId, this.roundQty((extraMap.get(item.variantId) ?? 0) + extraQty));
     }
 
-    for (const extraVariantId of extraMap.keys()) {
-      if (!variantIds.includes(extraVariantId)) {
-        throw new BadRequestException('Extra procurement item must belong to the demand consolidation');
-      }
-    }
-
+    const allVariantIds = [...new Set([...baseVariantIds, ...extraMap.keys()])];
     const variants = await this.prisma.productVariant.findMany({
-      where: { organizationId, id: { in: variantIds } },
+      where: { organizationId, id: { in: allVariantIds } },
       include: { product: true },
     });
+
+    if (variants.length !== allVariantIds.length) {
+      throw new BadRequestException('One or more extra procurement variants are invalid or inactive');
+    }
 
     const taxCodeIds = [
       ...new Set(
@@ -768,8 +789,10 @@ export class PurchaseOrdersService {
     let taxTotal = 0;
     let grandTotal = 0;
     const prepared: PreparedPurchaseOrderItem[] = [];
+    const processedVariants = new Set<string>();
 
     for (const item of items) {
+      processedVariants.add(item.variantId);
       const variant = variantMap.get(item.variantId);
       if (!variant) {
         throw new BadRequestException('Demand consolidation contains invalid variant');
@@ -797,6 +820,42 @@ export class PurchaseOrdersService {
 
       prepared.push({
         variantId: item.variantId,
+        orderedQty,
+        demandQty,
+        extraQty,
+        unitCost,
+        taxRate,
+        taxAmount: lineTax,
+        lineTotal,
+      });
+    }
+
+    for (const [variantId, extraQty] of extraMap.entries()) {
+      if (processedVariants.has(variantId) || extraQty <= 0) continue;
+      const variant = variantMap.get(variantId);
+      if (!variant) {
+        throw new BadRequestException('One or more extra procurement variants are invalid or inactive');
+      }
+
+      const demandQty = 0;
+      const orderedQty = extraQty;
+      const unitCost = this.roundMoney(this.toNumber(variant.distributorPrice));
+      const taxRate = this.roundMoney(
+        this.toNumber(
+          variant.product.taxCodeId
+            ? taxCodeMap.get(variant.product.taxCodeId)?.gstRate
+            : 0,
+        ),
+      );
+      const lineBase = this.roundMoney(orderedQty * unitCost);
+      const lineTax = this.roundMoney((lineBase * taxRate) / 100);
+      const lineTotal = this.roundMoney(lineBase + lineTax);
+      subtotal = this.roundMoney(subtotal + lineBase);
+      taxTotal = this.roundMoney(taxTotal + lineTax);
+      grandTotal = this.roundMoney(grandTotal + lineTotal);
+
+      prepared.push({
+        variantId,
         orderedQty,
         demandQty,
         extraQty,
@@ -850,32 +909,57 @@ export class PurchaseOrdersService {
     }));
   }
 
-  private prepareDemandExtraUpdates(
+  private async prepareDemandExtraUpdates(
+    organizationId: string,
     items: PurchaseOrderItem[],
     rawUpdates: UpdatePurchaseOrderDemandExtrasDto['items'],
-  ): PreparedPurchaseOrderPayload {
+  ): Promise<PreparedPurchaseOrderPayload> {
     const variantIds = new Set(items.map((item) => item.variantId));
     const extraMap = new Map<string, number>();
 
     for (const item of rawUpdates) {
-      if (!variantIds.has(item.variantId)) {
-        throw new BadRequestException('Extra procurement item must belong to the purchase order');
-      }
-
       const extraQty = this.roundQty(this.toNumber(item.extraQty));
       if (extraQty < 0) {
         throw new BadRequestException('Extra procurement quantity cannot be negative');
       }
-
       extraMap.set(item.variantId, extraQty);
     }
+
+    const newVariantIds = [...extraMap.keys()].filter((id) => !variantIds.has(id));
+    const variants = newVariantIds.length
+      ? await this.prisma.productVariant.findMany({
+          where: { organizationId, id: { in: newVariantIds }, status: 'active' },
+          include: { product: true },
+        })
+      : [];
+
+    if (newVariantIds.length && variants.length !== new Set(newVariantIds).size) {
+      throw new BadRequestException('One or more extra procurement variants are invalid or inactive');
+    }
+
+    const taxCodeIds = [
+      ...new Set(
+        variants
+          .map((variant) => variant.product.taxCodeId)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ];
+    const taxCodes = taxCodeIds.length
+      ? await this.prisma.taxCode.findMany({
+          where: { organizationId, id: { in: taxCodeIds } },
+        })
+      : [];
+    const taxCodeMap = new Map<string, any>(taxCodes.map((row): [string, any] => [row.id, row]));
+    const variantMap = new Map<string, any>(variants.map((variant): [string, any] => [variant.id, variant]));
 
     let subtotal = 0;
     let taxTotal = 0;
     let grandTotal = 0;
     const prepared: PreparedPurchaseOrderItem[] = [];
+    const processedVariants = new Set<string>();
 
     for (const item of items) {
+      processedVariants.add(item.variantId);
       const demandQty = this.roundQty(
         this.toNumber((item as PurchaseOrderItem & { demandQty?: Prisma.Decimal | number | string | null }).demandQty),
       );
@@ -896,6 +980,43 @@ export class PurchaseOrdersService {
 
       prepared.push({
         variantId: item.variantId,
+        orderedQty,
+        demandQty,
+        extraQty,
+        unitCost,
+        taxRate,
+        taxAmount,
+        lineTotal,
+      });
+    }
+
+    for (const [variantId, extraQty] of extraMap.entries()) {
+      if (processedVariants.has(variantId) || extraQty <= 0) continue;
+      const variant = variantMap.get(variantId);
+      if (!variant) {
+        throw new BadRequestException('One or more extra procurement variants are invalid or inactive');
+      }
+
+      const demandQty = 0;
+      const orderedQty = extraQty;
+      const unitCost = this.roundMoney(this.toNumber(variant.distributorPrice));
+      const taxRate = this.roundMoney(
+        this.toNumber(
+          variant.product.taxCodeId
+            ? taxCodeMap.get(variant.product.taxCodeId)?.gstRate
+            : 0,
+        ),
+      );
+      const lineBase = this.roundMoney(orderedQty * unitCost);
+      const taxAmount = this.roundMoney((lineBase * taxRate) / 100);
+      const lineTotal = this.roundMoney(lineBase + taxAmount);
+
+      subtotal = this.roundMoney(subtotal + lineBase);
+      taxTotal = this.roundMoney(taxTotal + taxAmount);
+      grandTotal = this.roundMoney(grandTotal + lineTotal);
+
+      prepared.push({
+        variantId,
         orderedQty,
         demandQty,
         extraQty,
