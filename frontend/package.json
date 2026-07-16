@@ -14,7 +14,8 @@
     "test:lookups": "vitest run src/features/lookups/__tests__ src/components/ui/__tests__/lookup-input.test.tsx",
     "test:operations": "vitest run src/features/goods-receipts/components/__tests__ src/features/purchase-orders/components/__tests__ src/features/dispatch/components/__tests__ src/features/inventory/components/__tests__ src/features/delivery/components/__tests__",
     "test:settings": "vitest run src/features/settings/components/__tests__",
-    "test:portal": "vitest run src/features/portal/components/__tests__"
+    "test:portal": "vitest run src/features/portal/components/__tests__",
+    "test:reports": "vitest run src/features/reports/components/__tests__"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.0",
