@@ -1,9 +1,10 @@
 import { DemandConsolidationDetailView } from '@/features/demand-consolidations/components/demand-consolidation-detail-view';
 
-export default function DemandConsolidationDetailPage({
+export default async function DemandConsolidationDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <DemandConsolidationDetailView id={params.id} />;
+  const { id } = await params;
+  return <DemandConsolidationDetailView id={id} />;
 }

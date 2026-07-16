@@ -1,9 +1,10 @@
 import { PaymentReceiptDetailView } from '@/features/payments/components/payment-receipt-detail-view';
 
-export default function PaymentReceiptDetailPage({
+export default async function PaymentReceiptDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <PaymentReceiptDetailView id={params.id} />;
+  const { id } = await params;
+  return <PaymentReceiptDetailView id={id} />;
 }

@@ -1,9 +1,10 @@
 import { StaffDeliveryStopView } from '@/features/staff/components/staff-delivery-stop-view';
 
-export default function StaffDeliveryStopPage({
+export default async function StaffDeliveryStopPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <StaffDeliveryStopView id={params.id} />;
+  const { id } = await params;
+  return <StaffDeliveryStopView id={id} />;
 }

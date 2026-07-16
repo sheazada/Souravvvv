@@ -1,9 +1,10 @@
 import { DispatchTripDetailView } from '@/features/dispatch/components/dispatch-trip-detail-view';
 
-export default function DispatchTripDetailPage({
+export default async function DispatchTripDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <DispatchTripDetailView id={params.id} />;
+  const { id } = await params;
+  return <DispatchTripDetailView id={id} />;
 }

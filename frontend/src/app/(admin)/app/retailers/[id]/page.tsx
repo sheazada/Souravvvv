@@ -1,9 +1,10 @@
 import { RetailerDetailView } from '@/features/retailers/components/retailer-detail-view';
 
-export default function RetailerDetailPage({
+export default async function RetailerDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <RetailerDetailView id={params.id} />;
+  const { id } = await params;
+  return <RetailerDetailView id={id} />;
 }

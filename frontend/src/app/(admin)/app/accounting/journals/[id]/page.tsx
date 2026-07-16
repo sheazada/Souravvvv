@@ -1,9 +1,10 @@
 import { JournalDetailView } from '@/features/accounting/components/journal-detail-view';
 
-export default function JournalDetailPage({
+export default async function JournalDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <JournalDetailView id={params.id} />;
+  const { id } = await params;
+  return <JournalDetailView id={id} />;
 }

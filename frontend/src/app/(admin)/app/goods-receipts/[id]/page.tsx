@@ -1,9 +1,10 @@
 import { GoodsReceiptDetailView } from '@/features/goods-receipts/components/goods-receipt-detail-view';
 
-export default function GoodsReceiptDetailPage({
+export default async function GoodsReceiptDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <GoodsReceiptDetailView id={params.id} />;
+  const { id } = await params;
+  return <GoodsReceiptDetailView id={id} />;
 }

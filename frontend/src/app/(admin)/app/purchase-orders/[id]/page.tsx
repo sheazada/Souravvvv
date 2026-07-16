@@ -1,9 +1,10 @@
 import { PurchaseOrderDetailView } from '@/features/purchase-orders/components/purchase-order-detail-view';
 
-export default function PurchaseOrderDetailPage({
+export default async function PurchaseOrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <PurchaseOrderDetailView id={params.id} />;
+  const { id } = await params;
+  return <PurchaseOrderDetailView id={id} />;
 }

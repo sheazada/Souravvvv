@@ -1,9 +1,10 @@
 import { SalesOrderDetailView } from '@/features/sales-orders/components/sales-order-detail-view';
 
-export default function SalesOrderDetailPage({
+export default async function SalesOrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <SalesOrderDetailView id={params.id} />;
+  const { id } = await params;
+  return <SalesOrderDetailView id={id} />;
 }

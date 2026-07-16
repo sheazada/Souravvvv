@@ -1,9 +1,10 @@
 import { StaffTripStopsView } from '@/features/staff/components/staff-trip-stops-view';
 
-export default function StaffTripStopsPage({
+export default async function StaffTripStopsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <StaffTripStopsView id={params.id} />;
+  const { id } = await params;
+  return <StaffTripStopsView id={id} />;
 }

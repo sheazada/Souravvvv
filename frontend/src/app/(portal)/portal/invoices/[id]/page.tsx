@@ -1,9 +1,10 @@
 import { PortalInvoiceDetailView } from '@/features/portal/components/portal-invoice-detail-view';
 
-export default function PortalInvoiceDetailPage({
+export default async function PortalInvoiceDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <PortalInvoiceDetailView id={params.id} />;
+  const { id } = await params;
+  return <PortalInvoiceDetailView id={id} />;
 }

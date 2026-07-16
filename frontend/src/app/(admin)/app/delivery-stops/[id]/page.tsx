@@ -1,9 +1,10 @@
 import { DeliveryStopDetailView } from '@/features/delivery/components/delivery-stop-detail-view';
 
-export default function DeliveryStopDetailPage({
+export default async function DeliveryStopDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <DeliveryStopDetailView id={params.id} />;
+  const { id } = await params;
+  return <DeliveryStopDetailView id={id} />;
 }

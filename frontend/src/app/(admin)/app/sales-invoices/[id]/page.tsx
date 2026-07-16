@@ -1,9 +1,10 @@
 import { SalesInvoiceDetailView } from '@/features/sales-invoices/components/sales-invoice-detail-view';
 
-export default function SalesInvoiceDetailPage({
+export default async function SalesInvoiceDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <SalesInvoiceDetailView id={params.id} />;
+  const { id } = await params;
+  return <SalesInvoiceDetailView id={id} />;
 }

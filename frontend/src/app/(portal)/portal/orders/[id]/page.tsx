@@ -1,9 +1,10 @@
 import { PortalOrderDetailView } from '@/features/portal/components/portal-order-detail-view';
 
-export default function PortalOrderDetailPage({
+export default async function PortalOrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <PortalOrderDetailView id={params.id} />;
+  const { id } = await params;
+  return <PortalOrderDetailView id={id} />;
 }
