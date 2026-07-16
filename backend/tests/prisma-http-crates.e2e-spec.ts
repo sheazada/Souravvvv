@@ -151,6 +151,7 @@ test('Prisma-backed HTTP e2e: create crate transaction records issue and automat
       retailerId: IDS.retailer,
       transactionType: 'issue',
       quantity: 10,
+      transactionDate: '2026-07-15T14:00:00.000Z',
       remarks: 'Evening dispatch issue',
     })
     .expect(201);

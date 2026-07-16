@@ -3,6 +3,7 @@ import {
   ArrayMinSize,
   IsArray,
   IsBoolean,
+  IsDateString,
   IsIn,
   IsNumber,
   IsOptional,
@@ -21,6 +22,10 @@ export class CreateCollectionEntryDto {
   paymentMode!: string;
 
   @IsOptional()
+  @IsDateString()
+  paymentDate?: string;
+
+  @IsOptional()
   @IsUUID()
   salesInvoiceId?: string;
 
@@ -31,6 +36,10 @@ export class CreateCollectionEntryDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsString()
+  remarks?: string;
 
   @IsOptional()
   @IsIn(['fifo', 'manual', 'advance'])

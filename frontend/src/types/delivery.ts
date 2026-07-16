@@ -96,3 +96,33 @@ export type DeliveryProofPayload = {
   photoUrl?: string;
   notes?: string;
 };
+
+export type DriverTripSummary = {
+  id: string;
+  tripNo: string;
+  route?: {
+    id: string;
+    code: string;
+    name: string;
+  } | null;
+  vehicle?: {
+    id: string;
+    vehicleNo: string;
+  } | null;
+  status: string;
+  totalStops: number;
+  totalCratesLoaded: number;
+  dispatchDate: string;
+};
+
+export type DriverCollectionSummary = {
+  totalCount: number;
+  totalAmount: number;
+  payments: Array<{
+    id: string;
+    receiptNo: string;
+    amount: number;
+    paymentMode: string;
+    paymentDate: string;
+  }>;
+};
