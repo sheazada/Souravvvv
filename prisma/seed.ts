@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../backend/node_modules/@prisma/client'
 import { IDS, PERMISSIONS, ROLE_PERMISSIONS, SEED_DATES } from './seed-data'
 
 const prisma = new PrismaClient()
@@ -663,10 +663,10 @@ async function seedWarehousingAndProcurementFlow() {
   })
 
   const purchaseInvoiceItems = [
-    { id: IDS.purchaseInvoiceItems.milk500, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.milk500, variantId: IDS.variants.tonedMilk500, billedQty: '42.000', unitCost: '25.50', taxRate: '0.00', taxAmount: '0.00', lineTotal: '1071.00' },
-    { id: IDS.purchaseInvoiceItems.milk1L, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.milk1L, variantId: IDS.variants.tonedMilk1L, billedQty: '6.000', unitCost: '49.00', taxRate: '0.00', taxAmount: '0.00', lineTotal: '294.00' },
-    { id: IDS.purchaseInvoiceItems.dahi200, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.dahi200, variantId: IDS.variants.dahi200, billedQty: '2.000', unitCost: '20.50', taxRate: '0.00', taxAmount: '0.00', lineTotal: '41.00' },
-    { id: IDS.purchaseInvoiceItems.paneer1Kg, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.paneer1Kg, variantId: IDS.variants.paneer1Kg, billedQty: '1.000', unitCost: '385.00', taxRate: '5.00', taxAmount: '19.25', lineTotal: '404.25' },
+    { id: IDS.purchaseInvoiceItems.milk500, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.milk500, variantId: IDS.variants.tonedMilk500, billedQty: '42.000', unitCost: '25.50', taxAmount: '0.00' },
+    { id: IDS.purchaseInvoiceItems.milk1L, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.milk1L, variantId: IDS.variants.tonedMilk1L, billedQty: '6.000', unitCost: '49.00', taxAmount: '0.00' },
+    { id: IDS.purchaseInvoiceItems.dahi200, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.dahi200, variantId: IDS.variants.dahi200, billedQty: '2.000', unitCost: '20.50', taxAmount: '0.00' },
+    { id: IDS.purchaseInvoiceItems.paneer1Kg, organizationId: ORG_ID, purchaseInvoiceId: IDS.purchaseInvoices.supplierInvoice, goodsReceiptItemId: IDS.goodsReceiptItems.paneer1Kg, variantId: IDS.variants.paneer1Kg, billedQty: '1.000', unitCost: '385.00', taxAmount: '19.25' },
   ]
   for (const item of purchaseInvoiceItems) await upsertById(prisma.purchaseInvoiceItem, item)
 
