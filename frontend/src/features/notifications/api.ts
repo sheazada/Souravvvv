@@ -29,4 +29,18 @@ export const NotificationsApi = {
   getTemplateById(id: string) {
     return apiClient<ApiSuccess<NotificationTemplateRow>>(`/notification-templates/${id}`);
   },
+  dispatch(payload: {
+    eventKey: string;
+    channel?: string;
+    recipientMobile: string;
+    recipientUserId?: string;
+    referenceType?: string;
+    referenceId?: string;
+    payload?: Record<string, any>;
+  }) {
+    return apiClient<ApiSuccess<NotificationLogRow>>('/notification-logs/dispatch', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
 };

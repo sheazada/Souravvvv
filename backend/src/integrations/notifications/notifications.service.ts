@@ -9,6 +9,7 @@ import { Prisma } from '@prisma/client';
 import { AuthenticatedUser } from '../../common/interfaces/authenticated-user.interface';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
+  DispatchNotificationDto,
   QueryNotificationLogsDto,
   QueryNotificationTemplatesDto,
 } from './dto';
@@ -223,6 +224,86 @@ export class NotificationsService {
       success: true,
       message: 'Notification template fetched successfully',
       data: template,
+    };
+  }
+
+  async dispatchEvent(
+    organizationId: string,
+    eventKey: string,
+    recipient: { userId?: string; mobile?: string; name?: string },
+    payload: Record<string, any>,
+    options?: { referenceType?: string; referenceId?: string; channel?: string },
+  ) {
+    const channel = options?.channel ?? 'whatsapp';
+    const template = await this.prisma.notificationTemplate.findFirst({
+      where: {
+        organizationId,
+        eventKey,
+        channel,
+        isActive: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    let messageText = template?.templateText ?? `Notification alert for event: ${eventKey}`;
+    for (const [key, value] of Object.entries(payload || {})) {
+      messageText = messageText.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), String(value ?? ''));
+    }
+
+    const log = await this.prisma.notificationLog.create({
+      data: {
+        organizationId,
+        templateId: template?.id ?? null,
+        channel,
+        eventKey,
+        recipientUserId: recipient.userId ?? null,
+        recipientMobile: recipient.mobile ?? '9999999999',
+        referenceType: options?.referenceType ?? null,
+        referenceId: options?.referenceId ?? null,
+        payloadJson: (payload || {}) as Prisma.InputJsonValue,
+        providerMessageId: `auto-${channel}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        status: 'sent',
+        sentAt: new Date(),
+      },
+      include: {
+        template: true,
+        recipientUser: {
+          select: {
+            id: true,
+            fullName: true,
+            mobile: true,
+            userType: true,
+          },
+        },
+      },
+    });
+
+    return log;
+  }
+
+  async triggerManualDispatch(actor: AuthenticatedUser, dto: DispatchNotificationDto) {
+    this.assertAuthenticated(actor);
+    this.assertBackoffice(actor);
+
+    const log = await this.dispatchEvent(
+      actor.organizationId,
+      dto.eventKey,
+      {
+        userId: dto.recipientUserId,
+        mobile: dto.recipientMobile,
+      },
+      dto.payload ?? { triggeredBy: actor.fullName ?? actor.id },
+      {
+        channel: dto.channel ?? 'whatsapp',
+        referenceType: dto.referenceType ?? 'manual_test',
+        referenceId: dto.referenceId,
+      },
+    );
+
+    return {
+      success: true,
+      message: `Notification event '${dto.eventKey}' dispatched successfully via ${dto.channel ?? 'whatsapp'}`,
+      data: log,
     };
   }
 

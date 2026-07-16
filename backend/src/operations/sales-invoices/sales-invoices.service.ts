@@ -4,11 +4,13 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
   UnauthorizedException,
 } from '@nestjs/common';
 import { DeliveryStopItem, Prisma, SalesInvoice, SalesInvoiceItem, SalesOrderItem } from '@prisma/client';
 import { AuthenticatedUser } from '../../common/interfaces/authenticated-user.interface';
 import { AccountingService } from '../../finance/accounting/accounting.service';
+import { NotificationsService } from '../../integrations/notifications/notifications.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreditControlService } from '../payments/credit-control.service';
 import { PaymentMetricsService } from '../payments/payment-metrics.service';
@@ -47,6 +49,7 @@ export class SalesInvoicesService {
     private readonly paymentMetricsService: PaymentMetricsService,
     private readonly retailerFinanceService: RetailerFinanceService,
     private readonly creditControlService: CreditControlService,
+    @Optional() private readonly notificationsService?: NotificationsService,
   ) {}
 
   async findAll(actor: AuthenticatedUser, query: QuerySalesInvoicesDto) {
@@ -567,6 +570,27 @@ export class SalesInvoicesService {
     });
     await this.accountingService.postSalesInvoice(actor, updated.id);
     await this.paymentMetricsService.refreshAfterInvoice(actor, updated.retailerId);
+
+    if (this.notificationsService) {
+      const retailer = await this.prisma.retailer.findFirst({ where: { id: updated.retailerId } });
+      if (retailer) {
+        await this.notificationsService
+          .dispatchEvent(
+            actor.organizationId,
+            'invoice.posted',
+            { userId: retailer.id, mobile: retailer.mobile },
+            {
+              invoiceNo: updated.invoiceNo,
+              grandTotal: this.toNumber(updated.grandTotal),
+              dueDate: updated.dueDate
+                ? new Date(updated.dueDate).toLocaleDateString('en-IN')
+                : 'Immediate',
+            },
+            { referenceType: 'sales_invoice', referenceId: updated.id, channel: 'whatsapp' },
+          )
+          .catch(() => null);
+      }
+    }
 
     return {
       success: true,

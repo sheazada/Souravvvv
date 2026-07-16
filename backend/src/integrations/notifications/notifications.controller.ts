@@ -1,9 +1,10 @@
-import { Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../../common/interfaces/authenticated-user.interface';
 import { NotificationsService } from './notifications.service';
 import {
+  DispatchNotificationDto,
   QueryNotificationLogsDto,
   QueryNotificationTemplatesDto,
 } from './dto';
@@ -12,6 +13,14 @@ import {
 @Controller()
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
+
+  @Post('notification-logs/dispatch')
+  dispatch(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Body() dto: DispatchNotificationDto,
+  ) {
+    return this.notificationsService.triggerManualDispatch(currentUser, dto);
+  }
 
   @Get('notification-logs')
   getLogs(

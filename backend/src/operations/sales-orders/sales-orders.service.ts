@@ -4,11 +4,13 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma, Retailer, Route } from '@prisma/client';
 import { AuthenticatedUser } from '../../common/interfaces/authenticated-user.interface';
 import { CreditControlService } from '../payments/credit-control.service';
+import { NotificationsService } from '../../integrations/notifications/notifications.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   CreateAssistedSalesOrderDto,
@@ -56,6 +58,7 @@ export class SalesOrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly creditControlService: CreditControlService,
+    @Optional() private readonly notificationsService?: NotificationsService,
   ) {}
 
   async create(actor: AuthenticatedUser, dto: CreateSalesOrderDto) {
@@ -419,11 +422,36 @@ export class SalesOrdersService {
       throw new BadRequestException('Cancelled order cannot be approved');
     }
 
-    await this.creditControlService.assertCreditAllowed(actor, order.retailerId, {
-      context: 'order_approval',
-      transactionAmount: this.toNumber(order.grandTotal),
-      salesOrderId: order.id,
-    });
+    try {
+      await this.creditControlService.assertCreditAllowed(actor, order.retailerId, {
+        context: 'order_approval',
+        transactionAmount: this.toNumber(order.grandTotal),
+        salesOrderId: order.id,
+      });
+    } catch (error) {
+      if (error instanceof ConflictException && this.notificationsService) {
+        const [retailer, profile] = await Promise.all([
+          this.prisma.retailer.findFirst({ where: { id: order.retailerId } }),
+          this.creditControlService.getCreditProfile(actor, order.retailerId).catch(() => null),
+        ]);
+        if (retailer) {
+          await this.notificationsService
+            .dispatchEvent(
+              actor.organizationId,
+              'order.blocked_by_credit',
+              { userId: retailer.id, mobile: retailer.mobile },
+              {
+              orderNo: order.orderNo,
+              currentOutstanding: this.toNumber(profile?.data?.metric?.currentOutstanding ?? 0),
+              creditLimit: this.toNumber(retailer.creditLimit),
+              },
+              { referenceType: 'sales_order', referenceId: order.id, channel: 'whatsapp' },
+            )
+            .catch(() => null);
+        }
+      }
+      throw error;
+    }
 
     await this.prisma.$transaction(async (tx) => {
       await tx.salesOrder.update({
@@ -455,6 +483,22 @@ export class SalesOrdersService {
         },
       });
     });
+
+    if (this.notificationsService) {
+      const retailer = await this.prisma.retailer.findFirst({ where: { id: order.retailerId } });
+      if (retailer) {
+        await this.notificationsService.dispatchEvent(
+          actor.organizationId,
+          'order.approved',
+          { userId: retailer.id, mobile: retailer.mobile },
+          {
+            orderNo: order.orderNo,
+            grandTotal: this.toNumber(order.grandTotal),
+          },
+          { referenceType: 'sales_order', referenceId: order.id, channel: 'whatsapp' },
+        ).catch(() => null);
+      }
+    }
 
     return this.findOne(actor, id);
   }

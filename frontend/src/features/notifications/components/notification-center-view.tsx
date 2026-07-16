@@ -34,6 +34,16 @@ export function NotificationCenterView() {
   const [templateFilters, setTemplateFilters] = useState<NotificationTemplateFilters>(DEFAULT_TEMPLATE_FILTERS);
   const [message, setMessage] = useState<string | null>(null);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dispatchForm, setDispatchForm] = useState({
+    eventKey: 'order.approved',
+    channel: 'whatsapp',
+    recipientMobile: '9876543210',
+    referenceType: 'test_alert',
+    orderNo: 'SO-20260716-TEST',
+    grandTotal: '15000',
+  });
+
   const [logsQuery, templatesQuery] = useQueries({
     queries: [
       {
@@ -58,6 +68,31 @@ export function NotificationCenterView() {
     },
   });
 
+  const dispatchMutation = useMutation({
+    mutationFn: (data: typeof dispatchForm) =>
+      NotificationsApi.dispatch({
+        eventKey: data.eventKey,
+        channel: data.channel,
+        recipientMobile: data.recipientMobile,
+        referenceType: data.referenceType,
+        payload: {
+          orderNo: data.orderNo,
+          grandTotal: data.grandTotal,
+          invoiceNo: data.orderNo.replace('SO-', 'INV-'),
+          currentOutstanding: '24500',
+          creditLimit: '50000',
+        },
+      }),
+    onSuccess: (res) => {
+      setMessage(`Test alert '${dispatchForm.eventKey}' dispatched via ${dispatchForm.channel.toUpperCase()}. Provider ID: ${res.data?.providerMessageId ?? 'sent'}`);
+      setIsModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['notification-logs'] });
+    },
+    onError: (error) => {
+      setMessage(error instanceof Error ? error.message : 'Failed to dispatch alert');
+    },
+  });
+
   const logs = logsQuery.data?.data ?? [];
   const logMeta = logsQuery.data?.meta;
   const templates = templatesQuery.data?.data ?? [];
@@ -74,14 +109,26 @@ export function NotificationCenterView() {
 
   return (
     <div>
-      <PageHeader
-        title={routeMeta.pageTitle}
-        description={routeMeta.pageDescription}
-      />
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-950">{routeMeta.pageTitle}</h1>
+          <p className="mt-1 text-sm text-slate-600">{routeMeta.pageDescription}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="rounded-xl border border-cyan-600 bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700 shadow-sm"
+        >
+          Trigger Test Alert / Dispatch
+        </button>
+      </div>
 
       {message ? (
-        <div className="mb-4 rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-sm text-cyan-900">
-          {message}
+        <div className="mb-4 rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-900 flex items-center justify-between">
+          <span>{message}</span>
+          <button type="button" onClick={() => setMessage(null)} className="text-xs font-semibold underline">
+            Dismiss
+          </button>
         </div>
       ) : null}
 
@@ -174,7 +221,7 @@ export function NotificationCenterView() {
                           <div className="text-xs text-slate-500">{log.recipientMobile ?? log.recipientUser?.mobile ?? '—'}</div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="rounded-full bg-cyan-50 px-2 py-1 text-xs font-medium text-cyan-800">
+                          <span className="rounded-full bg-cyan-50 px-2 py-1 text-xs font-medium text-cyan-800 capitalize">
                             {log.status}
                           </span>
                         </td>
@@ -267,7 +314,7 @@ export function NotificationCenterView() {
                       {template.channel}
                     </span>
                   </div>
-                  <div className="mt-3 rounded-lg bg-white p-3 text-slate-700">
+                  <div className="mt-3 rounded-lg bg-white p-3 text-slate-700 font-mono text-xs">
                     {template.templateText}
                   </div>
                 </div>
@@ -279,6 +326,91 @@ export function NotificationCenterView() {
           )}
         </section>
       </div>
+
+      {isModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-slate-950">Dispatch Test Alert / Manual Event</h2>
+            <p className="mt-1 text-xs text-slate-500">Simulate or trigger an outgoing event alert via WhatsApp, SMS, or Email.</p>
+
+            <div className="mt-4 space-y-3 text-sm">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Event Key</label>
+                <select
+                  value={dispatchForm.eventKey}
+                  onChange={(e) => setDispatchForm({ ...dispatchForm, eventKey: e.target.value })}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-cyan-500"
+                >
+                  <option value="order.approved">order.approved (Sales Order Approval)</option>
+                  <option value="invoice.posted">invoice.posted (Sales Invoice Posted)</option>
+                  <option value="order.blocked_by_credit">order.blocked_by_credit (Credit Limit Block)</option>
+                  <option value="delivery.completed">delivery.completed (Delivery Route Completed)</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Channel</label>
+                  <select
+                    value={dispatchForm.channel}
+                    onChange={(e) => setDispatchForm({ ...dispatchForm, channel: e.target.value })}
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-cyan-500"
+                  >
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="sms">SMS</option>
+                    <option value="email">Email</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Recipient Mobile</label>
+                  <input
+                    value={dispatchForm.recipientMobile}
+                    onChange={(e) => setDispatchForm({ ...dispatchForm, recipientMobile: e.target.value })}
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-cyan-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Order / Invoice No</label>
+                  <input
+                    value={dispatchForm.orderNo}
+                    onChange={(e) => setDispatchForm({ ...dispatchForm, orderNo: e.target.value })}
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-cyan-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Grand Total (₹)</label>
+                  <input
+                    value={dispatchForm.grandTotal}
+                    onChange={(e) => setDispatchForm({ ...dispatchForm, grandTotal: e.target.value })}
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-cyan-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => dispatchMutation.mutate(dispatchForm)}
+                disabled={dispatchMutation.isPending}
+                className="rounded-xl border border-cyan-600 bg-cyan-600 px-4 py-2 text-xs font-semibold text-white hover:bg-cyan-700 disabled:opacity-50 shadow-sm"
+              >
+                {dispatchMutation.isPending ? 'Dispatching...' : 'Dispatch Alert Now'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
