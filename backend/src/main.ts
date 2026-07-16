@@ -11,6 +11,10 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
 
   app.setGlobalPrefix('api/v1');
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
