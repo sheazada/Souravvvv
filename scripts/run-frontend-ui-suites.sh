@@ -14,7 +14,8 @@ resolve_targets() {
         "test:lookups" \
         "test:products" \
         "test:operations" \
-        "test:settings"
+        "test:settings" \
+        "test:portal"
       ;;
     typecheck-products)
       printf '%s\n' "typecheck:products"
@@ -33,6 +34,9 @@ resolve_targets() {
       ;;
     settings)
       printf '%s\n' "test:settings"
+      ;;
+    portal)
+      printf '%s\n' "test:portal"
       ;;
     dispatch)
       printf '%s\n' "vitest run src/features/dispatch/components/__tests__"

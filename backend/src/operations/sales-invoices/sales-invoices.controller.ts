@@ -165,6 +165,15 @@ export class SalesInvoicesController {
     return this.salesInvoicesService.getMyInvoices(currentUser, query);
   }
 
+  @Get('my/invoices/:id/export')
+  exportMyInvoice(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('format') format = 'pdf',
+  ) {
+    return this.salesInvoicesService.export(currentUser, id, format);
+  }
+
   @Get('my/invoices/:id')
   getMyInvoiceById(
     @CurrentUser() currentUser: AuthenticatedUser,

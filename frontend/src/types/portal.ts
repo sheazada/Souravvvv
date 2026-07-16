@@ -6,6 +6,7 @@ export type RetailerDashboardData = {
     status: string;
     orderDate: string;
     grandTotal: number | string;
+    orderingModeSnapshot?: string | null;
   } | null;
   recentInvoices: Array<{
     id: string;
@@ -14,6 +15,7 @@ export type RetailerDashboardData = {
     invoiceDate: string;
     grandTotal: number;
     outstandingAmount: number;
+    source?: string;
   }>;
   outstandingAmount: number;
 };
@@ -24,6 +26,7 @@ export type PortalOrderItem = {
   orderDate: string;
   requestedDeliveryDate?: string | null;
   source: string;
+  orderingModeSnapshot?: string | null;
   status: string;
   grandTotal: number | string;
   notes?: string | null;
@@ -32,6 +35,7 @@ export type PortalOrderItem = {
     cycleCode: string;
     deliveryDate: string;
     deliveryShift: string;
+    status?: string;
   } | null;
 };
 
@@ -58,7 +62,14 @@ export type PortalOrderDetail = PortalOrderItem & {
     status: string;
     grandTotal: number | string;
     outstandingAmount: number | string;
+    source?: string;
   }>;
+  route?: {
+    id: string;
+    code: string;
+    name: string;
+    deliveryShift?: string;
+  } | null;
 };
 
 export type PortalInvoiceItem = {
@@ -73,6 +84,8 @@ export type PortalInvoiceItem = {
   taxTotal: number;
   grandTotal: number;
   outstandingAmount: number;
+  pdfUrl?: string | null;
+  remarks?: string | null;
 };
 
 export type PortalInvoiceDetail = PortalInvoiceItem & {
@@ -192,4 +205,62 @@ export type PortalProfileData = {
     orderBlocked?: boolean;
     dispatchBlocked?: boolean;
   } | null;
+};
+
+export type PortalLedgerEntry = {
+  id: string;
+  organizationId?: string;
+  retailerId?: string;
+  entryNo: string;
+  entryDate: string;
+  entryTime: string;
+  transactionType: string;
+  referenceType: string;
+  referenceId?: string | null;
+  invoiceId?: string | null;
+  paymentReceiptId?: string | null;
+  creditNoteId?: string | null;
+  debitNoteId?: string | null;
+  paymentMethod?: string | null;
+  debitAmount: number;
+  creditAmount: number;
+  runningBalance: number;
+  remarks?: string | null;
+  createdAt: string;
+  invoice?: {
+    id: string;
+    invoiceNo: string;
+    invoiceDate: string;
+    grandTotal: number;
+    outstandingAmount: number;
+  } | null;
+  paymentReceipt?: {
+    id: string;
+    receiptNo: string;
+    paymentDate: string;
+    amount: number;
+    paymentMode: string;
+    status: string;
+  } | null;
+  creditNote?: {
+    id: string;
+    creditNoteNo: string;
+    noteDate: string;
+    amount: number;
+    status: string;
+  } | null;
+  debitNote?: {
+    id: string;
+    debitNoteNo: string;
+    noteDate: string;
+    amount: number;
+    status: string;
+  } | null;
+};
+
+export type PortalLedgerExportPayload = {
+  format: string;
+  retailerId: string;
+  fileName: string;
+  ledger: PortalLedgerEntry[];
 };

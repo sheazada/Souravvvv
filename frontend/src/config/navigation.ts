@@ -89,6 +89,7 @@ export const NAVIGATION_BY_AREA: Record<'admin' | 'portal' | 'staff', readonly N
     { label: 'Orders', href: '/portal/orders' },
     { label: 'Invoices', href: '/portal/invoices' },
     { label: 'Dues', href: '/portal/dues' },
+    { label: 'Ledger', href: '/portal/ledger' },
     { label: 'Profile', href: '/portal/profile' },
   ],
   staff: [
