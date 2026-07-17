@@ -118,6 +118,20 @@ export const ADMIN_ROUTE_REGISTRY = {
     unauthorizedDescription:
       'You need invoice permissions to review billed lines, allocations, and assisted billing context.',
   },
+  returns: {
+    permissions: [permissions.invoicesManage],
+    title: 'Returns & Claims',
+    pageTitle: 'Customer & Retailer Sale Returns & Claims',
+    pageDescription:
+      'Record damaged, leaked, or excess stock returns from retailers. Auto-restock inventory and issue instant credit notes.',
+    detailTitlePrefix: 'Sale Return',
+    detailPageDescription:
+      'Review return lines, disposition, and credit note settlement context.',
+    loadingDescription:
+      'Checking permissions and redirecting if returns access is not allowed.',
+    unauthorizedDescription:
+      'You need returns/invoices permissions to manage customer returns and damage claims.',
+  },
   demandConsolidations: {
     permissions: [permissions.procurementManage],
     title: 'Demand Consolidations',

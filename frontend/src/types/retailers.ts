@@ -25,6 +25,8 @@ export type RetailerDetail = RetailerListItem & {
   addressLine2?: string | null;
   state?: string | null;
   pincode?: string | null;
+  gstin?: string | null;
+  pan?: string | null;
   preferredDeliveryStart?: string | null;
   preferredDeliveryEnd?: string | null;
   openingBalance?: number | string;

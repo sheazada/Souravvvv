@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   Optional,
@@ -14,6 +16,7 @@ import { NotificationsService } from '../../integrations/notifications/notificat
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreditControlService } from '../payments/credit-control.service';
 import { PaymentMetricsService } from '../payments/payment-metrics.service';
+import { PaymentsService } from '../payments/payments.service';
 import { RetailerFinanceService } from '../payments/retailer-finance.service';
 import { RetailerLedgerService } from '../payments/retailer-ledger.service';
 import {
@@ -50,6 +53,7 @@ export class SalesInvoicesService {
     private readonly retailerFinanceService: RetailerFinanceService,
     private readonly creditControlService: CreditControlService,
     @Optional() private readonly notificationsService?: NotificationsService,
+    @Optional() @Inject(forwardRef(() => PaymentsService)) private readonly paymentsService?: PaymentsService,
   ) {}
 
   async findAll(actor: AuthenticatedUser, query: QuerySalesInvoicesDto) {
@@ -714,29 +718,31 @@ export class SalesInvoicesService {
       ? await this.getDispatchTripOrThrow(actor.organizationId, dto.dispatchTripId)
       : null;
 
-    if (!order && !trip) {
-      throw new BadRequestException('Sales order or dispatch trip is required for invoice generation');
+    if (!order && !trip && !dto.items?.length) {
+      throw new BadRequestException('Sales order, dispatch trip, or custom items required for invoice generation');
     }
     if (order && order.retailerId !== retailer.id) {
       throw new BadRequestException('Sales order retailer does not match invoice retailer');
     }
 
-    const existing = await this.prisma.salesInvoice.findFirst({
-      where: {
-        organizationId: actor.organizationId,
-        retailerId: retailer.id,
-        salesOrderId: order?.id ?? undefined,
-        dispatchTripId: trip?.id ?? undefined,
-        status: { not: 'cancelled' },
-      },
-      select: { id: true, invoiceNo: true },
-    });
+    if (order || trip) {
+      const existing = await this.prisma.salesInvoice.findFirst({
+        where: {
+          organizationId: actor.organizationId,
+          retailerId: retailer.id,
+          salesOrderId: order?.id ?? undefined,
+          dispatchTripId: trip?.id ?? undefined,
+          status: { not: 'cancelled' },
+        },
+        select: { id: true, invoiceNo: true },
+      });
 
-    if (existing) {
-      throw new ConflictException(`Invoice ${existing.invoiceNo} already exists for this context`);
+      if (existing) {
+        throw new ConflictException(`Invoice ${existing.invoiceNo} already exists for this context`);
+      }
     }
 
-    const lineContext = await this.buildInvoiceLines(actor.organizationId, retailer.id, order?.id ?? null, trip?.id ?? null);
+    const lineContext = await this.buildInvoiceLines(actor.organizationId, retailer.id, order?.id ?? null, trip?.id ?? null, dto.items);
     if (!lineContext.lines.length) {
       throw new BadRequestException('No deliverable/billable items found for invoice generation');
     }
@@ -758,6 +764,8 @@ export class SalesInvoicesService {
           return date;
         })();
 
+    const effectiveStatus = dto.status ?? (source === 'assisted_billing' && !dto.items?.length ? 'draft' : 'posted');
+
     const invoice = await this.prisma.$transaction(async (tx) => {
       const created = await tx.salesInvoice.create({
         data: {
@@ -770,7 +778,7 @@ export class SalesInvoicesService {
           dueDate,
           source,
           createdByUserId: actor.id,
-          status: 'posted',
+          status: effectiveStatus,
           paymentStatus: 'unpaid',
           subtotal: lineContext.subtotal,
           discountTotal: lineContext.discountTotal,
@@ -799,16 +807,48 @@ export class SalesInvoicesService {
       return created;
     });
 
-    await this.retailerLedgerService.postInvoiceDebit(actor, {
-      retailerId: invoice.retailerId,
-      invoiceId: invoice.id,
-      amount: this.toNumber(invoice.grandTotal),
-      entryDate: invoice.invoiceDate,
-      remarks: `Invoice ${invoice.invoiceNo} created`,
-      createdByUserId: actor.id,
-    });
-    await this.accountingService.postSalesInvoice(actor, invoice.id);
-    await this.paymentMetricsService.refreshAfterInvoice(actor, invoice.retailerId);
+    if (effectiveStatus === 'posted') {
+      await this.retailerLedgerService.postInvoiceDebit(actor, {
+        retailerId: invoice.retailerId,
+        invoiceId: invoice.id,
+        amount: this.toNumber(invoice.grandTotal),
+        entryDate: invoice.invoiceDate,
+        remarks: `Invoice ${invoice.invoiceNo} created`,
+        createdByUserId: actor.id,
+      });
+      await this.accountingService.postSalesInvoice(actor, invoice.id);
+      await this.paymentMetricsService.refreshAfterInvoice(actor, invoice.retailerId);
+
+      if (
+        this.paymentsService &&
+        dto.amountReceived &&
+        dto.amountReceived > 0 &&
+        dto.paymentMode &&
+        dto.paymentMode !== 'credit'
+      ) {
+        try {
+          const receipt = await this.paymentsService.create(actor, {
+            partyType: 'retailer',
+            partyId: retailer.id,
+            paymentDirection: 'inbound',
+            paymentMode: dto.paymentMode,
+            amount: dto.amountReceived,
+            paymentDate: invoice.invoiceDate.toISOString().slice(0, 10),
+            remarks: `Immediate collection against Invoice ${invoice.invoiceNo}`,
+          });
+          await this.paymentsService
+            .createAllocation(actor, receipt.data.id, {
+              salesInvoiceId: invoice.id,
+              allocatedAmount: Math.min(dto.amountReceived, this.toNumber(invoice.grandTotal)),
+              allocationDate: invoice.invoiceDate.toISOString(),
+            })
+            .catch(() => null);
+          await this.paymentsService.confirm(actor, receipt.data.id);
+        } catch (e) {
+          console.error('[createInvoice] Auto payment receipt recording error:', e);
+        }
+      }
+    }
 
     return this.findOne(actor, invoice.id);
   }
@@ -1036,7 +1076,12 @@ export class SalesInvoicesService {
     retailerId: string,
     salesOrderId: string | null,
     dispatchTripId: string | null,
+    customItems?: any[],
   ) {
+    if (customItems && customItems.length > 0 && !salesOrderId && !dispatchTripId) {
+      return this.buildInvoiceLinesFromCustomItems(customItems);
+    }
+
     if (salesOrderId) {
       const orderItems = await this.prisma.salesOrderItem.findMany({
         where: { organizationId, salesOrderId },
@@ -1071,6 +1116,45 @@ export class SalesInvoicesService {
       orderBy: { createdAt: 'asc' },
     });
     return this.buildInvoiceLinesFromStopItems(stopItems);
+  }
+
+  private buildInvoiceLinesFromCustomItems(
+    items: Array<{ variantId: string; billedQty: number; unitPrice?: number; discountAmount?: number; taxRate?: number; remarks?: string }>,
+  ) {
+    let subtotal = 0;
+    let discountTotal = 0;
+    let taxTotal = 0;
+    const lines = items.map((item) => {
+      const billedQty = Number(item.billedQty || 0);
+      const unitPrice = Number(item.unitPrice || 0);
+      const discountAmount = Number(item.discountAmount || 0);
+      const taxRate = Number(item.taxRate || 0);
+      const lineBase = Math.max(0, billedQty * unitPrice - discountAmount);
+      const taxAmount = this.roundMoney(lineBase * (taxRate / 100));
+      const lineTotal = this.roundMoney(lineBase + taxAmount);
+      subtotal += billedQty * unitPrice;
+      discountTotal += discountAmount;
+      taxTotal += taxAmount;
+      return {
+        variantId: item.variantId,
+        salesOrderItemId: null,
+        deliveryStopItemId: null,
+        billedQty,
+        unitPrice,
+        discountAmount,
+        taxRate,
+        taxAmount,
+        lineTotal,
+      };
+    });
+    const grandTotal = this.roundMoney(Math.max(0, subtotal - discountTotal) + taxTotal);
+    return {
+      subtotal: this.roundMoney(subtotal),
+      discountTotal: this.roundMoney(discountTotal),
+      taxTotal: this.roundMoney(taxTotal),
+      grandTotal,
+      lines,
+    };
   }
 
   private buildInvoiceLinesFromOrderItems(orderItems: SalesOrderItem[], stopItems: DeliveryStopItem[]) {

@@ -7,6 +7,7 @@ import { getAdminRouteMeta } from '@/config/admin-route-permissions';
 import { DashboardApi } from '@/features/dashboard/api';
 import { formatCurrency } from '@/lib/utils/number';
 import { useQueries } from '@tanstack/react-query';
+import Link from 'next/link';
 
 export function AdminDashboardView() {
   const dashboardMeta = getAdminRouteMeta('dashboard');
@@ -57,6 +58,61 @@ export function AdminDashboardView() {
   return (
     <div>
       <PageHeader title={dashboardMeta.pageTitle} description={dashboardMeta.pageDescription} />
+
+      {/* Quick Action Cards Toolbar */}
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          href="/app/sales-invoices/generate"
+          className="group flex items-center gap-3 rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-500 to-cyan-600 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 font-bold text-xl backdrop-blur-sm">
+            +
+          </div>
+          <div>
+            <div className="font-bold text-base leading-tight">Generate Invoice</div>
+            <div className="text-xs text-cyan-100 mt-0.5">Quick POS / Tax Invoice</div>
+          </div>
+        </Link>
+
+        <Link
+          href="/app/payments?action=new"
+          className="group flex items-center gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-500 to-emerald-600 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 font-bold text-xl backdrop-blur-sm">
+            ₹
+          </div>
+          <div>
+            <div className="font-bold text-base leading-tight">Payment Collection</div>
+            <div className="text-xs text-emerald-100 mt-0.5">Record Cash / UPI Receipt</div>
+          </div>
+        </Link>
+
+        <Link
+          href="/app/returns?action=new"
+          className="group flex items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-500 to-amber-600 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 font-bold text-xl backdrop-blur-sm">
+            ↩
+          </div>
+          <div>
+            <div className="font-bold text-base leading-tight">Add Sale Return</div>
+            <div className="text-xs text-amber-100 mt-0.5">Customer / Shop Returns</div>
+          </div>
+        </Link>
+
+        <Link
+          href="/app/retailers?action=new"
+          className="group flex items-center gap-3 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 font-bold text-xl backdrop-blur-sm">
+            🏪
+          </div>
+          <div>
+            <div className="font-bold text-base leading-tight">Add Retailer</div>
+            <div className="text-xs text-slate-300 mt-0.5">Onboard New Shop Account</div>
+          </div>
+        </Link>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <KpiCard label="Today's Sales" value={formatCurrency(summaryData?.todaySales ?? 0)} />

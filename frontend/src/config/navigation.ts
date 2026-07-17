@@ -59,6 +59,11 @@ export const NAVIGATION_BY_AREA: Record<'admin' | 'portal' | 'staff', readonly N
       requiredPermissions: getAdminRoutePermissions('salesInvoices'),
     },
     {
+      label: 'Returns & Claims',
+      href: '/app/returns',
+      requiredPermissions: getAdminRoutePermissions('returns'),
+    },
+    {
       label: 'Payments',
       href: '/app/payments',
       requiredPermissions: getAdminRoutePermissions('payments'),

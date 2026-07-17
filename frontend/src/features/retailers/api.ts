@@ -27,6 +27,24 @@ export const RetailersApi = {
   getById(id: string) {
     return apiClient<ApiSuccess<RetailerDetail>>(`/retailers/${id}`);
   },
+  create(payload: Record<string, any>) {
+    return apiClient<ApiSuccess<RetailerDetail>>('/retailers', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  update(id: string, payload: Record<string, any>) {
+    return apiClient<ApiSuccess<RetailerDetail>>(`/retailers/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+  updateStatus(id: string, payload: { businessStatus: string; reason?: string }) {
+    return apiClient<ApiSuccess<RetailerDetail>>(`/retailers/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
   getOutstanding(id: string) {
     return apiClient<ApiSuccess<RetailerOutstandingData>>(`/retailers/${id}/outstanding`);
   },
@@ -38,6 +56,12 @@ export const RetailersApi = {
   },
   getPayments(id: string) {
     return apiClient<ApiSuccess<RetailerPaymentRow[]>>(`/retailers/${id}/payments`);
+  },
+  getReturns(id: string) {
+    return apiClient<ApiSuccess<any[]>>(`/retailers/${id}/returns`);
+  },
+  getCrates(id: string) {
+    return apiClient<ApiSuccess<any[]>>(`/retailers/${id}/crates`);
   },
   getLedgerSummary(id: string) {
     return apiClient<ApiSuccess<RetailerLedgerSummary>>(`/retailers/${id}/ledger-summary`);

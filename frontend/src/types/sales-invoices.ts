@@ -94,6 +94,17 @@ export type GenerateSalesInvoicePayload = {
   dispatchTripId?: string;
   invoiceDate?: string;
   dueDate?: string;
-  source?: 'auto_delivery' | 'admin_manual' | 'assisted_billing';
+  source?: 'auto_delivery' | 'admin_manual' | 'assisted_billing' | string;
+  status?: 'draft' | 'posted' | string;
+  items?: Array<{
+    variantId: string;
+    billedQty: number;
+    unitPrice: number;
+    discountAmount?: number;
+    taxRate?: number;
+    remarks?: string;
+  }>;
+  paymentMode?: string;
+  amountReceived?: number;
   remarks?: string;
 };
