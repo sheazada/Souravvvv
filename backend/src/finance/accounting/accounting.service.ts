@@ -849,6 +849,50 @@ export class AccountingService {
     return `JV-${voucherType.toUpperCase()}-${datePart}-${String(total + 1).padStart(4, '0')}`;
   }
 
+  async getGstSummary(actor: AuthenticatedUser, query?: { fromDate?: string; toDate?: string }) {
+    this.assertAuthenticated(actor);
+
+    const whereDate = query?.fromDate || query?.toDate ? {
+      ...(query.fromDate ? { gte: new Date(query.fromDate) } : {}),
+      ...(query.toDate ? { lte: new Date(query.toDate) } : {}),
+    } : undefined;
+
+    const [salesAgg, purchaseAgg] = await Promise.all([
+      this.prisma.salesInvoice.aggregate({
+        where: {
+          organizationId: actor.organizationId,
+          status: { not: 'cancelled' },
+          ...(whereDate ? { invoiceDate: whereDate } : {}),
+        },
+        _sum: { subtotal: true, taxTotal: true, grandTotal: true },
+      }),
+      this.prisma.purchaseInvoice.aggregate({
+        where: {
+          organizationId: actor.organizationId,
+          status: { not: 'cancelled' },
+          ...(whereDate ? { invoiceDate: whereDate } : {}),
+        },
+        _sum: { taxableAmount: true, taxTotal: true, grandTotal: true },
+      }),
+    ]);
+
+    const outputGst = this.toNumber(salesAgg._sum?.taxTotal);
+    const inputTaxCredit = this.toNumber(purchaseAgg._sum?.taxTotal);
+    const netGstPayable = this.roundMoney(Math.max(0, outputGst - inputTaxCredit));
+
+    return {
+      success: true,
+      message: 'GST summary report generated successfully',
+      data: {
+        outputGst: this.roundMoney(outputGst),
+        inputTaxCredit: this.roundMoney(inputTaxCredit),
+        netGstPayable,
+        salesTaxable: this.toNumber(salesAgg._sum?.subtotal),
+        purchaseTaxable: this.toNumber(purchaseAgg._sum?.taxableAmount),
+      },
+    };
+  }
+
   private assertAuthenticated(actor?: AuthenticatedUser): asserts actor is AuthenticatedUser {
     if (!actor?.id || !actor.organizationId) {
       throw new UnauthorizedException('Authentication required');

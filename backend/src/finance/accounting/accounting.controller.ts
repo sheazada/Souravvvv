@@ -16,6 +16,15 @@ import { AccountingService } from './accounting.service';
 export class AccountingController {
   constructor(private readonly accountingService: AccountingService) {}
 
+  @Get('finance/gst-summary')
+  getGstSummary(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+  ) {
+    return this.accountingService.getGstSummary(currentUser, { fromDate, toDate });
+  }
+
   @Get('accounts')
   getAccounts(
     @CurrentUser() currentUser: AuthenticatedUser,

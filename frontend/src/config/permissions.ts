@@ -9,6 +9,7 @@ export const permissions = {
   inventoryManage: 'inventory.manage',
   dispatchManage: 'dispatch.manage',
   accountingManage: 'accounting.manage',
+  usersManage: 'users.manage',
   reportsRead: 'reports.read',
   notificationsManage: 'notifications.manage',
 } as const;

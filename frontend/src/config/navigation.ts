@@ -39,6 +39,26 @@ export const NAVIGATION_BY_AREA: Record<'admin' | 'portal' | 'staff', readonly N
       requiredPermissions: getAdminRoutePermissions('purchaseOrders'),
     },
     {
+      label: 'Suppliers',
+      href: '/app/suppliers',
+      requiredPermissions: getAdminRoutePermissions('suppliers'),
+    },
+    {
+      label: 'Vehicles',
+      href: '/app/vehicles',
+      requiredPermissions: getAdminRoutePermissions('vehicles'),
+    },
+    {
+      label: 'Employees',
+      href: '/app/employees',
+      requiredPermissions: getAdminRoutePermissions('employees'),
+    },
+    {
+      label: 'Routes & Areas',
+      href: '/app/routes',
+      requiredPermissions: getAdminRoutePermissions('routes'),
+    },
+    {
       label: 'Goods Receipts',
       href: '/app/goods-receipts',
       requiredPermissions: getAdminRoutePermissions('goodsReceipts'),
@@ -72,6 +92,11 @@ export const NAVIGATION_BY_AREA: Record<'admin' | 'portal' | 'staff', readonly N
       label: 'Accounting',
       href: '/app/accounting/accounts',
       requiredPermissions: getAdminRoutePermissions('accounting'),
+    },
+    {
+      label: 'Financial Statements',
+      href: '/app/reports/financial-statements',
+      requiredPermissions: getAdminRoutePermissions('financialStatements'),
     },
     {
       label: 'Finance Settings',
