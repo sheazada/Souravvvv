@@ -119,6 +119,21 @@ export const NAVIGATION_BY_AREA: Record<'admin' | 'portal' | 'staff', readonly N
       requiredPermissions: getAdminRoutePermissions('backups'),
     },
     {
+      label: 'Organization Profile',
+      href: '/app/organization',
+      requiredPermissions: getAdminRoutePermissions('organization'),
+    },
+    {
+      label: 'Delivery Cycles & Cut-offs',
+      href: '/app/delivery-cycles',
+      requiredPermissions: getAdminRoutePermissions('deliveryCycles'),
+    },
+    {
+      label: 'Offline Sync Center',
+      href: '/app/sync',
+      requiredPermissions: getAdminRoutePermissions('sync'),
+    },
+    {
       label: 'Reports',
       href: '/app/reports/daily-purchase',
       requiredPermissions: getAdminRoutePermissions('reports'),
