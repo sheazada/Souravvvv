@@ -70,9 +70,9 @@ export function Topbar({
         </div>
 
         {area === 'admin' ? (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full pb-1 sm:pb-0 sm:flex-wrap">
             {visibleShortcuts.map((shortcut) => (
-              <Link key={shortcut.href} href={shortcut.href} className={shortcut.className}>
+              <Link key={shortcut.href} href={shortcut.href} className={`${shortcut.className} flex-shrink-0 whitespace-nowrap`}>
                 {shortcut.label}
               </Link>
             ))}

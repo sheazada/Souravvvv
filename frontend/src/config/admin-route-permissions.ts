@@ -428,8 +428,9 @@ export const ADMIN_TOPBAR_SHORTCUTS: ReadonlyArray<{
     variant: 'default',
   },
   {
-    href: routes.adminRetailerNoteThresholds,
+    href: '/app/settings',
     routeKey: 'financeSettings',
+    label: '⚙ Settings & Theme Hub',
     variant: 'default',
   },
   {

@@ -232,7 +232,7 @@ export function VyaparPosBillingView({
         source: 'assisted_billing',
         status: 'posted',
         invoiceDate: activeTab.invoiceDate,
-        paymentMode: activeTab.isCreditMode ? undefined : 'UPI',
+        paymentMode: activeTab.isCreditMode ? undefined : 'upi',
         amountReceived: activeTab.isCreditMode ? 0 : totals.grandTotal,
         remarks: `${activeTab.title}: ${activeTab.description || 'Vyapar POS Billing Studio'}`,
         items: validItems.map((item) => ({

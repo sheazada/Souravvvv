@@ -63,7 +63,7 @@ export class GenerateSalesInvoiceDto {
   items?: CustomInvoiceItemDto[];
 
   @IsOptional()
-  @IsIn(['cash', 'upi', 'card', 'credit'])
+  @IsString()
   paymentMode?: string;
 
   @IsOptional()
