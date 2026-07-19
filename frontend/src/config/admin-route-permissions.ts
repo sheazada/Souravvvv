@@ -406,15 +406,15 @@ export const ADMIN_TOPBAR_SHORTCUTS: ReadonlyArray<{
   variant: 'primary' | 'default';
 }> = [
   {
-    href: '/app/dashboard?action=new-invoice',
+    href: '/app/sales-invoices/create',
     routeKey: 'salesInvoices',
-    label: '+ New Invoice Modal',
+    label: '+ Add Sale (Vyapar POS)',
     variant: 'primary',
   },
   {
     href: '/app/sales-invoices/generate',
     routeKey: 'salesInvoices',
-    label: '+ POS Tax Invoice',
+    label: '+ Print Layouts (Tally)',
     variant: 'primary',
   },
   {

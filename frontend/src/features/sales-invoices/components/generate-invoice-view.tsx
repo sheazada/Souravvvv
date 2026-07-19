@@ -7,6 +7,7 @@ import { RetailersApi } from '@/features/retailers/api';
 import { SalesInvoicesApi } from '@/features/sales-invoices/api';
 import { formatCurrency } from '@/lib/utils/number';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -244,6 +245,19 @@ export function GenerateInvoiceView() {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Vyapar/Tally Suite Mode Switcher */}
+      <div className="flex items-center gap-3 rounded-2xl border border-slate-300 bg-white p-2 shadow-xs">
+        <Link
+          href="/app/sales-invoices/create"
+          className="flex-1 text-center rounded-xl py-2.5 px-4 text-xs font-black uppercase tracking-wide text-slate-700 hover:bg-slate-100 transition-colors"
+        >
+          🛍️ Add Sale Studio (Vyapar POS Billing: Sale #1 | Sale #2)
+        </Link>
+        <div className="flex-1 text-center rounded-xl bg-cyan-600 py-2.5 px-4 text-xs font-black uppercase tracking-wide text-white shadow-xs">
+          🖨️ Print Layout Settings (Tally Theme & Thermal Customizer)
+        </div>
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-950">Tax Invoice Generation (POS & Accounting Suite)</h1>
