@@ -20,7 +20,8 @@ type ItemAction = {
 
 const ITEM_ACTIONS: Record<string, ItemAction[]> = {
   '/app/dashboard': [
-    { label: '+ Generate Invoice', href: '/app/sales-invoices/generate' },
+    { label: '+ Generate Invoice (POS)', href: '/app/sales-invoices/generate' },
+    { label: '+ New Invoice Modal', href: '/app/dashboard?action=new-invoice' },
     { label: '+ Payment Collection', href: '/app/payments' },
     { label: '+ Add Sale Return', href: '/app/returns' },
     { label: 'System Overview', href: '/app/dashboard' },
@@ -62,6 +63,7 @@ const ITEM_ACTIONS: Record<string, ItemAction[]> = {
   ],
   '/app/sales-invoices': [
     { label: '+ Generate Invoice (POS)', href: '/app/sales-invoices/generate' },
+    { label: '+ New Invoice Modal', href: '/app/dashboard?action=new-invoice' },
     { label: 'Outstanding Unpaid', href: '/app/sales-invoices?status=posted' },
     { label: 'Invoice Revision List', href: '/app/sales-invoices?status=revised' },
     { label: 'All Sales Invoices', href: '/app/sales-invoices' },
@@ -109,12 +111,32 @@ const ITEM_ACTIONS: Record<string, ItemAction[]> = {
   ],
 };
 
-export function Sidebar({ title, items }: { title: string; items: readonly NavigationItem[] }) {
+export function Sidebar({
+  title,
+  items,
+  isMobileOpen = false,
+  onCloseMobile,
+  isCollapsed: controlledCollapsed,
+  onToggleCollapse,
+}: {
+  title: string;
+  items: readonly NavigationItem[];
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+}) {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const isCollapsed = typeof controlledCollapsed !== 'undefined' ? controlledCollapsed : internalCollapsed;
+  const handleToggleCollapsed = () => {
+    if (onToggleCollapse) onToggleCollapse();
+    else setInternalCollapsed(!internalCollapsed);
+  };
 
   useEffect(() => {
     setCurrentUser(tokenStore.getStoredUser());
@@ -142,127 +164,176 @@ export function Sidebar({ title, items }: { title: string; items: readonly Navig
     ];
   };
 
-  const handleActionClick = (href: string) => {
+  const handleActionClick = (href: string, isMobile = false) => {
     setActiveMenuId(null);
+    if (isMobile && onCloseMobile) onCloseMobile();
     router.push(href);
   };
 
+  const renderNavList = (isMobile = false, collapsed = false) => (
+    <nav className="flex-1 space-y-1.5 p-3 overflow-y-auto" ref={isMobile ? undefined : menuRef}>
+      {visibleItems.map((item) => {
+        const menuKey = `${isMobile ? 'm' : 'd'}_${item.href}`;
+        const isMenuOpen = activeMenuId === menuKey;
+        const actions = getActionsForItem(item.href);
+
+        return (
+          <div key={item.href} className="relative group">
+            <div
+              className={`flex items-center justify-between rounded-xl transition-all duration-150 ${
+                collapsed ? 'justify-center py-2.5 px-2' : 'px-3 py-2'
+              } hover:bg-slate-100 text-slate-700 hover:text-slate-950`}
+            >
+              <Link
+                href={item.href}
+                onClick={() => {
+                  if (isMobile && onCloseMobile) onCloseMobile();
+                }}
+                title={collapsed ? item.label : undefined}
+                className={`flex-1 text-sm font-medium truncate ${collapsed ? 'text-center' : ''}`}
+              >
+                {collapsed ? item.label.slice(0, 2).toUpperCase() : item.label}
+              </Link>
+
+              {/* Three-Dot Menu Trigger */}
+              {!collapsed && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveMenuId(isMenuOpen ? null : menuKey);
+                  }}
+                  title={`Actions for ${item.label}`}
+                  className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                    isMenuOpen
+                      ? 'bg-cyan-100 text-cyan-900 font-bold'
+                      : 'text-slate-400 hover:bg-slate-200/80 hover:text-slate-700'
+                  }`}
+                >
+                  ⋮
+                </button>
+              )}
+            </div>
+
+            {/* Three-Dot Dropdown Actions */}
+            {isMenuOpen && !collapsed && (
+              <div className="absolute right-0 top-10 z-50 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150">
+                <div className="border-b border-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  {item.label} Quick Actions
+                </div>
+                <div className="mt-1 space-y-1">
+                  {actions.map((action, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleActionClick(action.href, isMobile)}
+                      className="flex w-full items-center rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 transition-colors cursor-pointer"
+                    >
+                      {action.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </nav>
+  );
+
   return (
-    <aside
-      className={`hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out lg:flex lg:flex-col ${
-        isCollapsed ? 'w-18' : 'w-64'
-      } relative z-30`}
-    >
-      {/* Sidebar Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
-        {!isCollapsed ? (
+    <>
+      {/* Mobile Backdrop & Slide-Over Drawer */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
+          onClick={onCloseMobile}
+        />
+      )}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col w-72 bg-white border-r border-slate-200 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
           <div className="overflow-hidden">
             <div className="text-[10px] uppercase tracking-[0.2em] font-semibold text-cyan-600">ERP Workspace</div>
             <div className="mt-0.5 text-base font-bold text-slate-900 truncate">{title}</div>
           </div>
-        ) : (
-          <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 font-bold text-white shadow-sm">
-            {title.slice(0, 2).toUpperCase()}
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-        >
-          {isCollapsed ? '»' : '«'}
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            title="Close Mobile Navigation Drawer"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-bold cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
 
-      {/* Navigation List */}
-      <nav className="flex-1 space-y-1.5 p-3 overflow-y-auto" ref={menuRef}>
-        {visibleItems.map((item) => {
-          const isMenuOpen = activeMenuId === item.href;
-          const actions = getActionsForItem(item.href);
+        {renderNavList(true, false)}
 
-          return (
-            <div key={item.href} className="relative group">
-              <div
-                className={`flex items-center justify-between rounded-xl transition-all duration-150 ${
-                  isCollapsed ? 'justify-center py-2.5 px-2' : 'px-3 py-2'
-                } hover:bg-slate-100 text-slate-700 hover:text-slate-950`}
-              >
-                <Link
-                  href={item.href}
-                  title={isCollapsed ? item.label : undefined}
-                  className={`flex-1 text-sm font-medium truncate ${isCollapsed ? 'text-center' : ''}`}
-                >
-                  {isCollapsed ? item.label.slice(0, 2).toUpperCase() : item.label}
-                </Link>
+        <div className="border-t border-slate-200 p-3 text-center">
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            <span>✕</span> Close Navigation Drawer
+          </button>
+        </div>
+      </aside>
 
-                {/* Three-Dot Menu Trigger */}
-                {!isCollapsed && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setActiveMenuId(isMenuOpen ? null : item.href);
-                    }}
-                    title={`Actions for ${item.label}`}
-                    className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg transition-colors ${
-                      isMenuOpen
-                        ? 'bg-cyan-100 text-cyan-900 font-bold'
-                        : 'text-slate-400 hover:bg-slate-200/80 hover:text-slate-700'
-                    }`}
-                  >
-                    ⋮
-                  </button>
-                )}
-              </div>
-
-              {/* Three-Dot Dropdown Actions */}
-              {isMenuOpen && !isCollapsed && (
-                <div className="absolute right-0 top-10 z-50 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="border-b border-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    {item.label} Quick Actions
-                  </div>
-                  <div className="mt-1 space-y-1">
-                    {actions.map((action, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handleActionClick(action.href)}
-                        className="flex w-full items-center rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 transition-colors"
-                      >
-                        {action.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+      {/* Desktop Sidebar */}
+      <aside
+        className={`hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out lg:flex lg:flex-col ${
+          isCollapsed ? 'w-18' : 'w-64'
+        } relative z-30`}
+      >
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
+          {!isCollapsed ? (
+            <div className="overflow-hidden">
+              <div className="text-[10px] uppercase tracking-[0.2em] font-semibold text-cyan-600">ERP Workspace</div>
+              <div className="mt-0.5 text-base font-bold text-slate-900 truncate">{title}</div>
             </div>
-          );
-        })}
-      </nav>
+          ) : (
+            <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 font-bold text-white shadow-sm">
+              {title.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleToggleCollapsed}
+            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+          >
+            {isCollapsed ? '»' : '«'}
+          </button>
+        </div>
 
-      {/* Sidebar Footer */}
-      <div className="border-t border-slate-200 p-3 text-center">
-        {!isCollapsed ? (
-          <button
-            type="button"
-            onClick={() => setIsCollapsed(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-          >
-            <span>«</span> Collapse Workspace
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setIsCollapsed(false)}
-            title="Expand Workspace"
-            className="mx-auto flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-600 hover:bg-slate-100"
-          >
-            »
-          </button>
-        )}
-      </div>
-    </aside>
+        {renderNavList(false, isCollapsed)}
+
+        <div className="border-t border-slate-200 p-3 text-center">
+          {!isCollapsed ? (
+            <button
+              type="button"
+              onClick={handleToggleCollapsed}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <span>«</span> Collapse Workspace
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleToggleCollapsed}
+              title="Expand Workspace"
+              className="mx-auto flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              »
+            </button>
+          )}
+        </div>
+      </aside>
+    </>
   );
 }

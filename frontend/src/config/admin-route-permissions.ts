@@ -402,8 +402,21 @@ export type AdminProtectedRouteKey = keyof typeof ADMIN_ROUTE_REGISTRY;
 export const ADMIN_TOPBAR_SHORTCUTS: ReadonlyArray<{
   routeKey: AdminProtectedRouteKey;
   href: string;
+  label?: string;
   variant: 'primary' | 'default';
 }> = [
+  {
+    href: '/app/dashboard?action=new-invoice',
+    routeKey: 'salesInvoices',
+    label: '+ New Invoice Modal',
+    variant: 'primary',
+  },
+  {
+    href: '/app/sales-invoices/generate',
+    routeKey: 'salesInvoices',
+    label: '+ POS Tax Invoice',
+    variant: 'primary',
+  },
   {
     href: routes.adminDashboard,
     routeKey: 'dashboard',
@@ -417,7 +430,7 @@ export const ADMIN_TOPBAR_SHORTCUTS: ReadonlyArray<{
   {
     href: routes.adminRetailerNoteThresholds,
     routeKey: 'financeSettings',
-    variant: 'primary',
+    variant: 'default',
   },
   {
     href: '/app/notifications',
@@ -449,16 +462,17 @@ export function getAdminRouteMeta(routeKey: AdminProtectedRouteKey) {
 export function getAdminTopbarShortcutMeta(shortcut: {
   routeKey: AdminProtectedRouteKey;
   href: string;
+  label?: string;
   variant: 'primary' | 'default';
 }) {
   const routeMeta = getAdminRouteMeta(shortcut.routeKey);
   return {
-    label: routeMeta.title,
+    label: shortcut.label ?? routeMeta.title,
     href: shortcut.href,
     routeKey: shortcut.routeKey,
     className:
       shortcut.variant === 'primary'
-        ? 'rounded-xl border border-cyan-300 px-3 py-2 text-sm font-medium text-cyan-900 hover:bg-cyan-50'
-        : 'rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
+        ? 'rounded-xl bg-cyan-600 border border-cyan-500 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-cyan-700 transition-colors'
+        : 'rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors',
   };
 }

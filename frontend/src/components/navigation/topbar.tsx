@@ -10,7 +10,19 @@ import type { CurrentUser } from '@/types/auth';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
-export function Topbar({ title, area }: { title: string; area: 'admin' | 'portal' | 'staff' }) {
+export function Topbar({
+  title,
+  area,
+  onToggleSidebar,
+  onOpenMobileSidebar,
+  isCollapsed,
+}: {
+  title: string;
+  area: 'admin' | 'portal' | 'staff';
+  onToggleSidebar?: () => void;
+  onOpenMobileSidebar?: () => void;
+  isCollapsed?: boolean;
+}) {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   useEffect(() => {
@@ -27,13 +39,36 @@ export function Topbar({ title, area }: { title: string; area: 'admin' | 'portal
     ).map((shortcut) => getAdminTopbarShortcutMeta(shortcut));
   }, [area, currentUser]);
 
+  const handleSidebarClick = () => {
+    if (onToggleSidebar) {
+      onToggleSidebar();
+    } else if (onOpenMobileSidebar) {
+      onOpenMobileSidebar();
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur md:px-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Dairy Distributor ERP</div>
-          <div className="text-lg font-semibold text-slate-900">{title}</div>
+    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-6 shadow-xs">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          {/* Three-Dot & Hamburger Sidebar Toggle Trigger */}
+          <button
+            type="button"
+            onClick={handleSidebarClick}
+            title="Open / Toggle Workspace Navigation Sidebar (⋮)"
+            aria-label="Open Workspace Navigation Sidebar"
+            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-700 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-900 transition-all shadow-2xs group flex-shrink-0 cursor-pointer"
+          >
+            <span className="text-lg font-black leading-none text-cyan-600 group-hover:scale-110 transition-transform">⋮</span>
+            <span className="text-xs font-bold tracking-wide">Sidebar</span>
+          </button>
+
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-cyan-600">Dairy Distributor ERP</div>
+            <div className="text-base md:text-lg font-bold text-slate-900 truncate">{title}</div>
+          </div>
         </div>
+
         {area === 'admin' ? (
           <div className="flex flex-wrap items-center gap-2">
             {visibleShortcuts.map((shortcut) => (
