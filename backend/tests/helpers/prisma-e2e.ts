@@ -1,5 +1,7 @@
 // @ts-nocheck
 import 'reflect-metadata';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -42,6 +44,27 @@ export const IDS = {
 let prismaSingleton: PrismaClient | null = null;
 
 export function ensureTestDatabaseUrl() {
+  if (!process.env.TEST_DATABASE_URL && !process.env.DATABASE_URL) {
+    const candidateDirs = [
+      path.resolve(__dirname, '../..'),
+      path.resolve(__dirname, '../../..'),
+      process.cwd(),
+    ];
+    for (const dir of candidateDirs) {
+      for (const envFile of ['.env.test', '.env']) {
+        const envPath = path.join(dir, envFile);
+        if (fs.existsSync(envPath)) {
+          const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+          for (const line of lines) {
+            const match = line.match(/^(TEST_DATABASE_URL|DATABASE_URL)=(.+)$/);
+            if (match && match[2] && !process.env[match[1]]) {
+              process.env[match[1]] = match[2].trim();
+            }
+          }
+        }
+      }
+    }
+  }
   const url = process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL;
   if (!url) {
     throw new Error(

@@ -1,5 +1,5 @@
 export default () => ({
-  port: parseInt(process.env.PORT ?? '3000', 10),
+  port: parseInt(process.env.PORT ?? '3001', 10),
   appName: process.env.APP_NAME ?? 'Dairy Distributor ERP API',
   jwtSecret: process.env.JWT_SECRET ?? 'change-me',
   nodeEnv: process.env.NODE_ENV ?? 'development',
