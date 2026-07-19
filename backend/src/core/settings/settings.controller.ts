@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -44,5 +45,27 @@ export class SettingsController {
   @Delete('settings/retailer-note-thresholds')
   resetRetailerNoteThresholds(@CurrentUser() currentUser: AuthenticatedUser) {
     return this.settingsService.resetRetailerNoteThresholds(currentUser);
+  }
+
+  @Get('settings/backups')
+  listBackups(@CurrentUser() currentUser: AuthenticatedUser) {
+    return this.settingsService.listBackups(currentUser);
+  }
+
+  @Post('settings/backups')
+  createBackup(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Body('backupName') backupName?: string,
+    @Body('targetStorage') targetStorage?: string,
+  ) {
+    return this.settingsService.createBackup(currentUser, { backupName, targetStorage });
+  }
+
+  @Post('settings/backups/:id/restore')
+  restoreBackup(
+    @CurrentUser() currentUser: AuthenticatedUser,
+    @Param('id') id: string,
+  ) {
+    return this.settingsService.restoreBackup(currentUser, id);
   }
 }

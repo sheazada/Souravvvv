@@ -99,9 +99,24 @@ export const NAVIGATION_BY_AREA: Record<'admin' | 'portal' | 'staff', readonly N
       requiredPermissions: getAdminRoutePermissions('financialStatements'),
     },
     {
+      label: 'Pricing & Promos',
+      href: '/app/pricing',
+      requiredPermissions: getAdminRoutePermissions('pricing'),
+    },
+    {
+      label: 'AI & Forecasting',
+      href: '/app/forecasting',
+      requiredPermissions: getAdminRoutePermissions('forecasting'),
+    },
+    {
       label: 'Finance Settings',
       href: '/app/settings/retailer-note-thresholds',
       requiredPermissions: getAdminRoutePermissions('financeSettings'),
+    },
+    {
+      label: 'Database Backups',
+      href: '/app/settings/backups',
+      requiredPermissions: getAdminRoutePermissions('backups'),
     },
     {
       label: 'Reports',
