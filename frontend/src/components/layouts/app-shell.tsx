@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Sidebar } from '@/components/navigation/sidebar';
-import { Topbar } from '@/components/navigation/topbar';
-import { NAVIGATION_BY_AREA } from '@/config/navigation';
+import React, { useState } from "react";
+import { Sidebar } from "@/components/navigation/sidebar";
+import { Topbar } from "@/components/navigation/topbar";
+import { NAVIGATION_BY_AREA } from "@/config/navigation";
 
 export function AppShell({
   area,
   title,
   children,
 }: {
-  area: 'admin' | 'portal' | 'staff';
+  area: "admin" | "portal" | "staff";
   title: string;
   children: React.ReactNode;
 }) {
@@ -18,7 +18,7 @@ export function AppShell({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-100 flex relative">
+    <div className="relative flex min-h-screen bg-slate-100 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.10),transparent_32rem)] dark:bg-slate-950">
       <Sidebar
         title={title}
         items={NAVIGATION_BY_AREA[area]}
@@ -32,7 +32,7 @@ export function AppShell({
           title={title}
           area={area}
           onToggleSidebar={() => {
-            if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+            if (typeof window !== "undefined" && window.innerWidth < 1024) {
               setIsMobileOpen(!isMobileOpen);
             } else {
               setIsCollapsed(!isCollapsed);
@@ -41,7 +41,9 @@ export function AppShell({
           onOpenMobileSidebar={() => setIsMobileOpen(true)}
           isCollapsed={isCollapsed}
         />
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          <div className="mx-auto w-full max-w-[1500px]">{children}</div>
+        </main>
       </div>
     </div>
   );
