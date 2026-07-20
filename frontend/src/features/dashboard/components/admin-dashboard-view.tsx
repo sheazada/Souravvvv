@@ -117,71 +117,71 @@ export function AdminDashboardView() {
         </div>
       )}
 
-      {/* Quick Action Cards Toolbar (Updated with Vyapar POS & Tally Print Suite) */}
+      {/* Quick Action Cards Toolbar (Sleek Minimal Executive SaaS Theme) */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <button
           type="button"
           onClick={() => setIsNewInvoiceModalOpen(true)}
-          className="group flex items-center gap-3 rounded-2xl border border-cyan-300 bg-gradient-to-br from-cyan-600 to-cyan-700 p-4 text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg text-left cursor-pointer"
+          className="group flex items-center gap-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:border-cyan-500/60 dark:hover:border-cyan-500/60 hover:shadow-xs transition-all text-left cursor-pointer"
         >
-          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 font-bold text-xl backdrop-blur-sm group-hover:scale-110 transition-transform">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-cyan-50 dark:bg-cyan-950/40 font-black text-xl text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform">
             🛍️
           </div>
-          <div>
-            <div className="font-bold text-base leading-tight">Add Sale (Vyapar POS)</div>
-            <div className="text-xs text-cyan-100 mt-0.5">Sale #1 | Sale #2 Studio</div>
+          <div className="min-w-0">
+            <div className="font-extrabold text-sm text-slate-950 dark:text-white truncate">Add Sale (POS Studio)</div>
+            <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Sale #1 | Sale #2 Studio</div>
           </div>
         </button>
 
         <Link
           href="/app/sales-invoices/generate"
-          className="group flex items-center gap-3 rounded-2xl border border-blue-300 bg-gradient-to-br from-blue-600 to-blue-700 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+          className="group flex items-center gap-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:border-cyan-500/60 dark:hover:border-cyan-500/60 hover:shadow-xs transition-all"
         >
-          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 font-bold text-xl backdrop-blur-sm group-hover:scale-110 transition-transform">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-cyan-50 dark:bg-cyan-950/40 font-black text-xl text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform">
             🖨️
           </div>
-          <div>
-            <div className="font-bold text-base leading-tight">Print Layouts (Tally)</div>
-            <div className="text-xs text-blue-100 mt-0.5">Thermal / Regular Print View</div>
+          <div className="min-w-0">
+            <div className="font-extrabold text-sm text-slate-950 dark:text-white truncate">Print Layouts (Tally)</div>
+            <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Thermal / Regular Print</div>
           </div>
         </Link>
 
         <Link
           href="/app/payments?action=new"
-          className="group flex items-center gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-500 to-emerald-600 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+          className="group flex items-center gap-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:border-cyan-500/60 dark:hover:border-cyan-500/60 hover:shadow-xs transition-all"
         >
-          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 font-bold text-xl backdrop-blur-sm group-hover:scale-110 transition-transform">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/40 font-black text-xl text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
             ₹
           </div>
-          <div>
-            <div className="font-bold text-base leading-tight">Payment Collection</div>
-            <div className="text-xs text-emerald-100 mt-0.5">Record Cash / UPI Receipt</div>
+          <div className="min-w-0">
+            <div className="font-extrabold text-sm text-slate-950 dark:text-white truncate">Payment Collection</div>
+            <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Record Cash / UPI Receipt</div>
           </div>
         </Link>
 
         <Link
           href="/app/returns?action=new"
-          className="group flex items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-500 to-amber-600 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+          className="group flex items-center gap-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:border-cyan-500/60 dark:hover:border-cyan-500/60 hover:shadow-xs transition-all"
         >
-          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 font-bold text-xl backdrop-blur-sm group-hover:scale-110 transition-transform">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950/40 font-black text-xl text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
             ↩
           </div>
-          <div>
-            <div className="font-bold text-base leading-tight">Add Sale Return</div>
-            <div className="text-xs text-amber-100 mt-0.5">Customer / Shop Returns</div>
+          <div className="min-w-0">
+            <div className="font-extrabold text-sm text-slate-950 dark:text-white truncate">Add Sale Return</div>
+            <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Customer / Shop Returns</div>
           </div>
         </Link>
 
         <Link
           href="/app/retailers?action=new"
-          className="group flex items-center gap-3 rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 p-4 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+          className="group flex items-center gap-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:border-cyan-500/60 dark:hover:border-cyan-500/60 hover:shadow-xs transition-all"
         >
-          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 font-bold text-xl backdrop-blur-sm group-hover:scale-110 transition-transform">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 font-black text-xl text-slate-700 dark:text-slate-300 group-hover:scale-105 transition-transform">
             🏪
           </div>
-          <div>
-            <div className="font-bold text-base leading-tight">Add Retailer</div>
-            <div className="text-xs text-slate-300 mt-0.5">Onboard New Shop Account</div>
+          <div className="min-w-0">
+            <div className="font-extrabold text-sm text-slate-950 dark:text-white truncate">Add Retailer</div>
+            <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Onboard Shop Account</div>
           </div>
         </Link>
       </div>
