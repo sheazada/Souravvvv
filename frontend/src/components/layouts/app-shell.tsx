@@ -18,7 +18,7 @@ export function AppShell({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-100 flex relative">
+    <div className="min-h-screen flex relative" style={{ backgroundColor: 'var(--zoho-bg)' }}>
       <Sidebar
         title={title}
         items={NAVIGATION_BY_AREA[area]}

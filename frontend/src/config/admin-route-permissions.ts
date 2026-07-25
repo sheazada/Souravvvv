@@ -408,14 +408,14 @@ export const ADMIN_TOPBAR_SHORTCUTS: ReadonlyArray<{
   {
     href: '/app/sales-invoices/create',
     routeKey: 'salesInvoices',
-    label: '+ Add Sale (Vyapar POS)',
+    label: '+ New',
     variant: 'primary',
   },
   {
     href: '/app/sales-invoices/generate',
     routeKey: 'salesInvoices',
-    label: '+ Print Layouts (Tally)',
-    variant: 'primary',
+    label: 'Invoices',
+    variant: 'default',
   },
   {
     href: routes.adminDashboard,
@@ -430,7 +430,7 @@ export const ADMIN_TOPBAR_SHORTCUTS: ReadonlyArray<{
   {
     href: '/app/settings',
     routeKey: 'financeSettings',
-    label: '⚙ Settings & Theme Hub',
+    label: 'Settings',
     variant: 'default',
   },
   {
@@ -473,7 +473,7 @@ export function getAdminTopbarShortcutMeta(shortcut: {
     routeKey: shortcut.routeKey,
     className:
       shortcut.variant === 'primary'
-        ? 'rounded-xl bg-cyan-600 border border-cyan-500 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-cyan-700 transition-colors'
-        : 'rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors',
+        ? 'rounded bg-[var(--zoho-blue)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--zoho-blue-hover)] transition-colors'
+        : 'rounded border border-transparent px-3 py-1.5 text-xs font-medium text-[var(--zoho-text-secondary)] hover:bg-[var(--zoho-bg)] hover:text-[var(--zoho-text-primary)] transition-colors',
   };
 }

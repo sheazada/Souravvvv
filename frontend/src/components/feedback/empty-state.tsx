@@ -1,8 +1,8 @@
 export function EmptyState({ title, description }: { title: string; description?: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
-      <h3 className="text-lg font-medium text-slate-900">{title}</h3>
-      {description ? <p className="mt-2 text-sm text-slate-500">{description}</p> : null}
+    <div className="rounded border border-dashed border-[var(--zoho-border)] bg-[var(--zoho-bg)] p-8 text-center">
+      <h3 className="text-[14px] font-medium text-[var(--zoho-text-primary)]">{title}</h3>
+      {description ? <p className="mt-1.5 text-[12px] text-[var(--zoho-text-muted)]">{description}</p> : null}
     </div>
   );
 }

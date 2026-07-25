@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss';
 import path from 'path';
 
-// Helper to guarantee absolute, forward-slash normalization across Windows & Monorepo worker threads
 const joinPath = (subpath: string) => path.join(__dirname, subpath).replace(/\\/g, '/');
 
 const config: Config = {
@@ -16,8 +15,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
+        zoho: {
+          blue: '#1366D9',
+          'blue-hover': '#0F56B3',
+          'blue-light': '#EBF2FC',
+          green: '#22A06B',
+          red: '#DE350B',
+          amber: '#FFAB00',
+          orange: '#FF8B00',
+        },
+      },
+      borderRadius: {
+        DEFAULT: '4px',
+      },
+      fontSize: {
+        'zoho-xs': ['11px', { lineHeight: '1.4', fontWeight: '600' }],
+        'zoho-sm': ['13px', { lineHeight: '1.5', fontWeight: '400' }],
+        'zoho-base': ['14px', { lineHeight: '1.5', fontWeight: '400' }],
+        'zoho-md': ['15px', { lineHeight: '1.4', fontWeight: '600' }],
       },
     },
   },

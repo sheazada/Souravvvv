@@ -3,649 +3,491 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sudha Dairy Distributor ERP — Executive Zoho-Grade Live Preview</title>
+  <title>Sudha Dairy Distributor ERP — Zoho Invoice Live Preview</title>
   <style>
     :root {
-      --bg-main: #f1f5f9;
-      --bg-card: #ffffff;
-      --bg-sub: #f8fafc;
-      --border-color: #e2e8f0;
-      --text-main: #0f172a;
-      --text-sub: #64748b;
-      --text-muted: #94a3b8;
-      --primary: #0891b2;
-      --primary-hover: #0e7490;
-      --primary-light: #ecfeff;
-      --emerald: #10b981;
-      --emerald-light: #d1fae5;
-      --rose: #f43f5e;
-      --rose-light: #ffe4e6;
-      --amber: #f59e0b;
-      --amber-light: #fef3c7;
-      --orange: #ea580c;
-      --topbar-bg: rgba(255, 255, 255, 0.95);
-      --sidebar-bg: #ffffff;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --zoho-bg: #f4f5f7; --zoho-card: #fff; --zoho-sidebar: #fff; --zoho-topbar: #fff;
+      --zoho-border: #e1e4e8; --zoho-border-light: #eceef1;
+      --zoho-blue: #1366d9; --zoho-blue-hover: #0f56b3; --zoho-blue-light: #ebf2fc;
+      --zoho-green: #22a06b; --zoho-green-light: #e3fcef;
+      --zoho-red: #de350b; --zoho-red-light: #ffebe6;
+      --zoho-amber: #ffab00; --zoho-orange: #ff8b00;
+      --text: #1a1d23; --text2: #5e6370; --text3: #8c919a;
     }
     [data-theme="dark"] {
-      --bg-main: #0f172a;
-      --bg-card: #1e293b;
-      --bg-sub: #0f172a;
-      --border-color: #334155;
-      --text-main: #f8fafc;
-      --text-sub: #cbd5e1;
-      --text-muted: #64748b;
-      --primary: #06b6d4;
-      --primary-hover: #0891b2;
-      --primary-light: rgba(6, 182, 212, 0.15);
-      --emerald: #10b981;
-      --emerald-light: rgba(16, 185, 129, 0.15);
-      --rose: #fb7185;
-      --rose-light: rgba(244, 63, 94, 0.15);
-      --amber: #fbbf24;
-      --amber-light: rgba(245, 158, 11, 0.15);
-      --orange: #fb923c;
-      --topbar-bg: rgba(30, 41, 59, 0.95);
-      --sidebar-bg: #1e293b;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --zoho-bg: #151921; --zoho-card: #1e232d; --zoho-sidebar: #1a1e28; --zoho-topbar: #1e232d;
+      --zoho-border: #2d333b; --zoho-border-light: #242930;
+      --zoho-blue-light: rgba(19,102,217,0.12); --zoho-green-light: rgba(34,160,107,0.15);
+      --zoho-red-light: rgba(222,53,11,0.15);
+      --text: #e6edf3; --text2: #9ba4b0; --text3: #6b7280;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.1s ease; }
-    body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; overflow-x: hidden; }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif; }
+    body { background:var(--zoho-bg); color:var(--text); min-height:100vh; display:flex; font-size:14px; }
 
     /* Sidebar */
-    #sidebar { width: 256px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s ease, opacity 0.3s ease; z-index: 40; overflow: hidden; }
-    #sidebar.collapsed { width: 0 !important; border: none !important; opacity: 0 !important; pointer-events: none; }
-    .sidebar-header { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; white-space: nowrap; }
-    .sidebar-header .logo-text { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--primary); font-weight: 800; }
-    .sidebar-header .title-text { font-size: 1.1rem; font-weight: 900; color: var(--text-main); margin-top: 0.1rem; }
-    .nav-section { padding: 0.75rem 0.75rem 0.25rem; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); }
-    .nav-list { list-style: none; padding: 0.25rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
-    .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.75rem; border-radius: 0.75rem; color: var(--text-sub); font-size: 0.875rem; font-weight: 600; cursor: pointer; text-decoration: none; }
-    .nav-item:hover, .nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 700; }
-    .nav-item .three-dot { font-size: 1rem; font-weight: 900; color: var(--text-muted); padding: 0.15rem 0.35rem; border-radius: 0.4rem; }
+    #sidebar { width:220px; background:var(--zoho-sidebar); border-right:1px solid var(--zoho-border); display:flex; flex-direction:column; flex-shrink:0; transition:width 0.3s,opacity 0.3s; z-index:40; overflow:hidden; }
+    #sidebar.collapsed { width:0!important; border:none!important; opacity:0!important; pointer-events:none; }
+    .sb-hdr { padding:12px 16px; border-bottom:1px solid var(--zoho-border); }
+    .sb-logo { font-size:10px; text-transform:uppercase; letter-spacing:0.15em; font-weight:600; color:var(--zoho-blue); }
+    .sb-title { font-size:14px; font-weight:600; color:var(--text); margin-top:2px; }
+    .sb-section { padding:12px 12px 4px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); }
+    .sb-item { display:flex; align-items:center; justify-content:space-between; padding:7px 12px; margin:1px 8px; font-size:13px; font-weight:500; color:var(--text2); cursor:pointer; border-left:3px solid transparent; transition:all 0.15s; }
+    .sb-item:hover { background:var(--zoho-bg); color:var(--text); }
+    .sb-item.active { background:var(--zoho-blue-light); color:var(--zoho-blue); font-weight:600; border-left-color:var(--zoho-blue); }
+    .sb-dots { font-size:10px; color:var(--text3); padding:0 4px; }
 
     /* Main */
-    #main-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
-    #topbar { position: sticky; top: 0; z-index: 30; background: var(--topbar-bg); border-bottom: 1px solid var(--border-color); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; backdrop-filter: blur(8px); box-shadow: var(--shadow-sm); }
-    .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
-    .hamburger-btn { background: var(--bg-sub); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.45rem 0.65rem; border-radius: 0.65rem; font-size: 1.1rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
-    .topbar-title { font-size: 1.15rem; font-weight: 900; color: var(--text-main); }
-    .topbar-shortcuts { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-    .pill { padding: 0.45rem 0.85rem; border-radius: 0.65rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: none; white-space: nowrap; border: 1px solid var(--border-color); background: var(--bg-sub); color: var(--text-main); }
-    .pill.primary { background: var(--primary); border-color: var(--primary); color: white; box-shadow: var(--shadow-sm); }
-    #workspace { flex: 1; padding: 1.5rem; overflow-y: auto; }
-    .tab-content { display: none; animation: fadeIn 0.2s ease-in-out; }
-    .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    #main { flex:1; display:flex; flex-direction:column; min-width:0; min-height:100vh; }
+    #topbar { position:sticky; top:0; z-index:30; background:var(--zoho-topbar); border-bottom:1px solid var(--zoho-border); padding:0 24px; min-height:44px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .tb-left { display:flex; align-items:center; gap:10px; }
+    .tb-btn { background:none; border:none; color:var(--text3); cursor:pointer; padding:6px; border-radius:4px; display:flex; align-items:center; }
+    .tb-btn:hover { background:var(--zoho-bg); color:var(--text); }
+    .tb-title { font-size:15px; font-weight:600; color:var(--text); }
+    .tb-right { display:flex; align-items:center; gap:8px; }
+    .tb-link { font-size:12px; font-weight:500; padding:5px 12px; border-radius:4px; color:var(--text2); cursor:pointer; transition:all 0.15s; text-decoration:none; }
+    .tb-link:hover { background:var(--zoho-bg); color:var(--text); }
+    .tb-link.primary { background:var(--zoho-blue); color:#fff; }
+    .tb-link.primary:hover { background:var(--zoho-blue-hover); }
+
+    #workspace { flex:1; padding:20px 24px; overflow-y:auto; }
+    .tab { display:none; animation:fadeIn 0.2s; }
+    .tab.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
 
     /* Cards */
-    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1.25rem; padding: 1.25rem; box-shadow: var(--shadow-sm); }
-    .kpi-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-sub); }
-    .kpi-value { font-size: 1.65rem; font-weight: 900; color: var(--text-main); margin-top: 0.35rem; font-family: monospace; }
+    .card { background:var(--zoho-card); border:1px solid var(--zoho-border); border-radius:8px; padding:20px; margin-bottom:20px; }
+    .card-title { font-size:15px; font-weight:600; color:var(--text); }
+    .card-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+    .grid-2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:20px; }
+    .grid-4 { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:20px; }
+    .grid-5 { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
 
-    /* Zoho aging card */
-    .aging-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); }
-    .aging-bar { display: flex; height: 14px; width: 100%; border-radius: 9999px; overflow: hidden; margin: 1.25rem 0; gap: 2px; background: var(--bg-sub); }
-    .aging-segment { height: 100%; }
+    /* KPI */
+    .kpi { background:var(--zoho-card); border:1px solid var(--zoho-border-light); border-radius:6px; padding:16px; }
+    .kpi-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text3); }
+    .kpi-val { font-size:20px; font-weight:600; color:var(--text); margin-top:4px; font-family:monospace; }
+    .kpi-trend { font-size:11px; font-weight:500; margin-top:4px; }
+    .kpi-trend.up { color:var(--zoho-green); }
+    .kpi-trend.down { color:var(--zoho-red); }
 
-    /* Tables */
-    .tbl-wrap { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 1.25rem; background: var(--bg-card); margin-bottom: 1.5rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th { background: var(--bg-sub); padding: 0.75rem 1rem; text-align: left; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-sub); border-bottom: 1px solid var(--border-color); }
-    td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; }
-    tr:last-child td { border-bottom: none; }
+    /* Table */
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { background:var(--zoho-bg); padding:8px 12px; text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; color:var(--text3); border-bottom:1px solid var(--zoho-border); }
+    td { padding:10px 12px; border-bottom:1px solid var(--zoho-border-light); color:var(--text); }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--zoho-blue-light); }
+
+    /* Aging bar */
+    .age-bar { display:flex; height:6px; width:100%; border-radius:9999px; overflow:hidden; gap:2px; background:var(--zoho-bg); margin:16px 0; }
+
+    /* Expense row */
+    .exp-row { display:flex; align-items:center; gap:12px; padding:4px 0; }
+    .exp-name { min-width:140px; font-size:12px; font-weight:500; color:var(--text); }
+    .exp-track { flex:1; height:6px; border-radius:9999px; background:var(--zoho-bg); overflow:hidden; }
+    .exp-fill { height:100%; border-radius:9999px; background:var(--zoho-blue); }
+    .exp-amt { min-width:75px; text-align:right; font-size:12px; font-weight:600; font-family:monospace; color:var(--text2); }
+
+    /* Toggle */
+    .toggle { display:flex; border:1px solid var(--zoho-border); border-radius:4px; background:var(--zoho-bg); padding:2px; font-size:11px; font-weight:500; }
+    .toggle button { padding:4px 10px; border:none; background:none; color:var(--text3); cursor:pointer; border-radius:3px; }
+    .toggle button.active { background:var(--zoho-card); color:var(--text); box-shadow:0 1px 2px rgba(0,0,0,0.06); border:1px solid var(--zoho-border); }
 
     /* POS */
-    .pos-studio { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1.5rem; padding: 1.5rem; box-shadow: var(--shadow-sm); }
-    .pos-tabs-bar { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
-    .credit-cash-switch { display: flex; background: var(--bg-sub); border: 1px solid var(--border-color); border-radius: 1rem; padding: 0.2rem; }
-    .credit-cash-switch button { padding: 0.35rem 0.85rem; border-radius: 0.75rem; border: none; font-size: 0.75rem; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-sub); }
-    .credit-cash-switch button.active-cash { background: var(--emerald); color: white; }
-    .credit-cash-switch button.active-credit { background: var(--primary); color: white; }
-    .save-btn { background: var(--primary); color: white; border: none; padding: 0.85rem 2rem; border-radius: 0.85rem; font-size: 1rem; font-weight: 900; cursor: pointer; box-shadow: var(--shadow-md); width: 100%; margin-top: 0.75rem; }
-    .save-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
-    .alert-banner { background: var(--emerald-light); border: 1px solid var(--emerald); color: var(--text-main); padding: 0.85rem 1.25rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 700; display: none; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; animation: fadeIn 0.2s ease-in-out; }
-    .pos-tab { padding: 0.35rem 0.85rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 800; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-sub); color: var(--text-sub); }
-    .pos-tab.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
-    .form-control { width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border-color); border-radius: 0.65rem; background: var(--bg-card); color: var(--text-main); font-size: 0.85rem; font-weight: 600; }
-    .form-group label { display: block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-sub); margin-bottom: 0.3rem; }
-    .party-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
-    .pos-footer { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.25rem; }
-    .pos-totals-box { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 0.65rem; }
-    .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 700; color: var(--text-sub); }
-    .grand-total-row { display: flex; justify-content: space-between; align-items: center; font-size: 1.35rem; font-weight: 900; color: var(--text-main); padding: 0.65rem 0; border-top: 2px solid var(--border-color); }
-    .expense-row { display: flex; align-items: center; gap: 0.75rem; }
-    .expense-bar-track { flex: 1; height: 8px; border-radius: 9999px; background: var(--bg-sub); overflow: hidden; }
-    .expense-bar-fill { height: 100%; border-radius: 9999px; }
-    .tally-preview-box { background: #fff; border: 1px solid #ccc; padding: 2rem; border-radius: 0.5rem; max-width: 700px; margin: 0 auto; color: #000; font-size: 0.85rem; }
-    .tally-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 1rem; margin-bottom: 1rem; }
+    .pos-tab { padding:4px 12px; border-radius:4px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid var(--zoho-border); background:var(--zoho-bg); color:var(--text2); }
+    .pos-tab.active { background:var(--zoho-blue-light); color:var(--zoho-blue); border-color:var(--zoho-blue); }
+    .cc-sw { display:flex; background:var(--zoho-bg); border:1px solid var(--zoho-border); border-radius:4px; padding:2px; }
+    .cc-sw button { padding:4px 12px; border:none; background:none; font-size:12px; font-weight:600; cursor:pointer; color:var(--text3); border-radius:3px; }
+    .cc-sw button.act { background:var(--zoho-green); color:#fff; }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 16px; font-size:13px; font-weight:600; border-radius:4px; border:1px solid var(--zoho-border); background:var(--zoho-card); color:var(--text); cursor:pointer; }
+    .btn:hover { background:var(--zoho-bg); }
+    .btn.primary { background:var(--zoho-blue); border-color:var(--zoho-blue); color:#fff; }
+    .btn.primary:hover { background:var(--zoho-blue-hover); }
+    .btn.text { background:none; border-color:transparent; color:var(--zoho-blue); }
+    .btn.text:hover { background:var(--zoho-blue-light); }
+    input,select,textarea { padding:7px 10px; font-size:13px; border:1px solid var(--zoho-border); border-radius:4px; background:var(--zoho-card); color:var(--text); width:100%; outline:none; }
+    input:focus,select:focus,textarea:focus { border-color:var(--zoho-blue); box-shadow:0 0 0 2px var(--zoho-blue-light); }
+    label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text3); margin-bottom:4px; }
+    .save-btn { background:var(--zoho-blue); color:#fff; border:none; padding:10px 32px; border-radius:4px; font-size:14px; font-weight:600; cursor:pointer; width:100%; margin-top:8px; }
+    .save-btn:hover { background:var(--zoho-blue-hover); }
+    .alert { background:var(--zoho-green-light); border:1px solid var(--zoho-green); color:var(--text); padding:12px 16px; border-radius:6px; font-size:13px; font-weight:600; display:none; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .tag { display:inline-flex; padding:2px 8px; font-size:11px; font-weight:600; border-radius:3px; }
+    .tag-green { background:var(--zoho-green-light); color:var(--zoho-green); }
+    .tag-blue { background:var(--zoho-blue-light); color:var(--zoho-blue); }
+    .tag-red { background:var(--zoho-red-light); color:var(--zoho-red); }
 
-    /* Zoho Sales & Expenses mini-bar */
-    .zoho-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-    .zoho-summary-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1rem; text-align: center; box-shadow: var(--shadow-sm); }
-    .zoho-summary-card .z-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-sub); }
-    .zoho-summary-card .z-value { font-size: 1.35rem; font-weight: 900; font-family: monospace; margin-top: 0.25rem; }
+    /* Tally print */
+    .tally { background:#fff; border:1px solid #ccc; padding:32px; border-radius:4px; max-width:700px; margin:0 auto; color:#000; font-size:13px; }
+    .tally-hdr { text-align:center; border-bottom:2px solid #000; padding-bottom:16px; margin-bottom:16px; }
   </style>
 </head>
 <body>
-
-  <!-- Sidebar -->
   <aside id="sidebar">
-    <div class="sidebar-header">
-      <div>
-        <div class="logo-text">Sudha Dairy ERP</div>
-        <div class="title-text">Distributor Pro</div>
-      </div>
-      <button type="button" class="hamburger-btn" onclick="toggleSidebar()" title="Collapse">✕</button>
+    <div class="sb-hdr">
+      <div class="sb-logo">Sudha Dairy</div>
+      <div class="sb-title">Distributor Pro</div>
     </div>
-    <div style="flex:1; padding:0.75rem 0; overflow-y:auto;">
-      <div class="nav-section">Operations & POS</div>
-      <ul class="nav-list">
-        <li><a class="nav-item active" onclick="switchTab('dashboard-tab',this)"><span>📊 Executive Dashboard</span> <span class="three-dot">⋮</span></a></li>
-        <li><a class="nav-item" onclick="switchTab('pos-tab',this)"><span>🛍️ Vyapar POS Studio</span> <span class="three-dot">⋮</span></a></li>
-        <li><a class="nav-item" onclick="switchTab('print-tab',this)"><span>🖨️ Tally Print Layouts</span> <span class="three-dot">⋮</span></a></li>
-      </ul>
-      <div class="nav-section" style="margin-top:1rem;">Inventory & Masters</div>
-      <ul class="nav-list">
-        <li><a class="nav-item" onclick="switchTab('retailers-tab',this)"><span>🏪 Retailers Directory</span> <span class="three-dot">⋮</span></a></li>
-        <li><a class="nav-item" onclick="switchTab('products-tab',this)"><span>📦 Products & Stock</span> <span class="three-dot">⋮</span></a></li>
-      </ul>
-      <div class="nav-section" style="margin-top:1rem;">System & Settings</div>
-      <ul class="nav-list">
-        <li><a class="nav-item" onclick="switchTab('settings-tab',this)"><span>⚙️ System Settings Hub</span> <span class="three-dot">⋮</span></a></li>
-      </ul>
+    <div style="flex:1;overflow-y:auto;">
+      <div class="sb-section">Operations & POS</div>
+      <div class="sb-item active" onclick="switchTab('dashboard',this)">📊 Dashboard <span class="sb-dots">···</span></div>
+      <div class="sb-item" onclick="switchTab('pos',this)">🛒 POS Studio <span class="sb-dots">···</span></div>
+      <div class="sb-item" onclick="switchTab('print',this)">🖨 Print Layouts <span class="sb-dots">···</span></div>
+      <div class="sb-section">Inventory & Masters</div>
+      <div class="sb-item" onclick="switchTab('retailers',this)">🏪 Retailers <span class="sb-dots">···</span></div>
+      <div class="sb-item" onclick="switchTab('products',this)">📦 Products <span class="sb-dots">···</span></div>
+      <div class="sb-section" style="margin-top:16px;">System</div>
+      <div class="sb-item" onclick="switchTab('settings',this)">⚙ Settings <span class="sb-dots">···</span></div>
     </div>
-    <div style="padding:1rem; border-top:1px solid var(--border-color); text-align:center;">
-      <button type="button" class="pill" style="width:100%; font-weight:800;" onclick="toggleTheme()">
-        <span id="theme-btn-text">🌙 Switch to Dark Mode</span>
+    <div style="padding:12px;border-top:1px solid var(--zoho-border);">
+      <button class="btn" style="width:100%;justify-content:center;font-size:12px;" onclick="toggleTheme()">
+        <span id="theme-icon">🌙</span> <span id="theme-txt">Dark Mode</span>
       </button>
     </div>
   </aside>
 
-  <!-- Main -->
-  <div id="main-wrapper">
+  <div id="main">
     <header id="topbar">
-      <div class="topbar-left">
-        <button type="button" class="hamburger-btn" onclick="toggleSidebar()">☰</button>
-        <div class="topbar-title" id="page-title">Executive Dashboard</div>
+      <div class="tb-left">
+        <button class="tb-btn" onclick="toggleSidebar()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+        </button>
+        <span class="tb-title" id="page-title">Dashboard</span>
       </div>
-      <div class="topbar-shortcuts">
-        <a class="pill primary" onclick="switchTab('pos-tab',document.querySelectorAll('.nav-list a')[1])">+ Add Sale</a>
-        <a class="pill" onclick="switchTab('print-tab',document.querySelectorAll('.nav-list a')[2])">🖨️ Print</a>
-        <a class="pill" onclick="switchTab('settings-tab',document.querySelectorAll('.nav-list a')[5])">⚙️ Settings</a>
+      <div class="tb-right">
+        <a class="tb-link primary" onclick="switchTab('pos',document.querySelectorAll('.sb-item')[1])">+ New</a>
+        <a class="tb-link" onclick="switchTab('print',document.querySelectorAll('.sb-item')[2])">Invoices</a>
+        <a class="tb-link" onclick="switchTab('settings',document.querySelectorAll('.sb-item')[5])">Settings</a>
       </div>
     </header>
 
     <main id="workspace">
-
-      <!-- Alert -->
-      <div id="alert-box" class="alert-banner">
+      <div id="alert-box" class="alert">
         <span id="alert-msg"></span>
-        <button type="button" onclick="this.parentElement.style.display='none'" style="background:transparent;border:none;font-weight:900;cursor:pointer;">✕</button>
+        <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;font-weight:700;cursor:pointer;">✕</button>
       </div>
 
-      <!-- TAB 1: Dashboard (Zoho Invoice Parity) -->
-      <div id="dashboard-tab" class="tab-content active">
-
-        <!-- 1. Total Receivables & Aging -->
-        <div class="aging-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="tab active">
+        <!-- Receivables -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
             <div>
-              <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--text-sub);letter-spacing:0.05em;">Total Receivables</div>
-              <div style="font-size:1.85rem;font-weight:900;color:var(--text-main);margin-top:0.25rem;">₹4,82,450.05</div>
+              <div class="kpi-label">Total Receivables</div>
+              <div style="font-size:26px;font-weight:700;color:var(--text);font-family:monospace;margin-top:4px;">₹4,82,450.05</div>
             </div>
-            <button type="button" class="pill" onclick="switchTab('retailers-tab',document.querySelectorAll('.nav-list a')[3])">View Unpaid Dues →</button>
+            <a class="btn text" onclick="switchTab('retailers',document.querySelectorAll('.sb-item')[3])">View Unpaid →</a>
           </div>
-          <div class="aging-bar">
-            <div class="aging-segment" style="width:42%;background:#10b981;" title="Current: ₹2,02,629"></div>
-            <div class="aging-segment" style="width:28%;background:#06b6d4;" title="1-15 Days: ₹1,35,086"></div>
-            <div class="aging-segment" style="width:18%;background:#f59e0b;" title="16-30 Days: ₹86,841"></div>
-            <div class="aging-segment" style="width:8%;background:#ea580c;" title="31-45 Days: ₹38,596"></div>
-            <div class="aging-segment" style="width:4%;background:#f43f5e;" title="Above 45: ₹19,298"></div>
+          <div class="age-bar">
+            <div style="width:42%;background:var(--zoho-green);"></div>
+            <div style="width:28%;background:var(--zoho-blue);"></div>
+            <div style="width:18%;background:var(--zoho-amber);"></div>
+            <div style="width:8%;background:var(--zoho-orange);"></div>
+            <div style="width:4%;background:var(--zoho-red);"></div>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.75rem;font-size:0.8rem;">
-            <div style="padding:0.75rem;border-radius:0.75rem;background:var(--bg-sub);border:1px solid var(--border-color);">
-              <div style="color:var(--text-sub);font-weight:700;">Current</div>
-              <div style="font-family:monospace;font-weight:900;font-size:0.95rem;margin-top:0.25rem;">₹2,02,629</div>
+          <div class="grid-5">
+            <div style="background:var(--zoho-bg);border-radius:6px;padding:10px;">
+              <div style="font-size:11px;color:var(--text3);font-weight:500;">Current</div>
+              <div style="font-size:13px;font-weight:600;font-family:monospace;margin-top:2px;">₹2,02,629</div>
             </div>
-            <div style="padding:0.75rem;border-radius:0.75rem;background:var(--bg-sub);border:1px solid var(--border-color);">
-              <div style="color:var(--text-sub);font-weight:700;">1–15 Days</div>
-              <div style="font-family:monospace;font-weight:900;font-size:0.95rem;margin-top:0.25rem;">₹1,35,086</div>
+            <div style="background:var(--zoho-bg);border-radius:6px;padding:10px;">
+              <div style="font-size:11px;color:var(--text3);font-weight:500;">1–15 Days</div>
+              <div style="font-size:13px;font-weight:600;font-family:monospace;margin-top:2px;">₹1,35,086</div>
             </div>
-            <div style="padding:0.75rem;border-radius:0.75rem;background:var(--bg-sub);border:1px solid var(--border-color);">
-              <div style="color:var(--text-sub);font-weight:700;">16–30 Days</div>
-              <div style="font-family:monospace;font-weight:900;font-size:0.95rem;margin-top:0.25rem;">₹86,841</div>
+            <div style="background:var(--zoho-bg);border-radius:6px;padding:10px;">
+              <div style="font-size:11px;color:var(--text3);font-weight:500;">16–30 Days</div>
+              <div style="font-size:13px;font-weight:600;font-family:monospace;margin-top:2px;">₹86,841</div>
             </div>
-            <div style="padding:0.75rem;border-radius:0.75rem;background:var(--bg-sub);border:1px solid var(--border-color);">
-              <div style="color:var(--text-sub);font-weight:700;">31–45 Days</div>
-              <div style="font-family:monospace;font-weight:900;font-size:0.95rem;margin-top:0.25rem;">₹38,596</div>
+            <div style="background:var(--zoho-bg);border-radius:6px;padding:10px;">
+              <div style="font-size:11px;color:var(--text3);font-weight:500;">31–45 Days</div>
+              <div style="font-size:13px;font-weight:600;font-family:monospace;margin-top:2px;">₹38,596</div>
             </div>
-            <div style="padding:0.75rem;border-radius:0.75rem;background:var(--bg-sub);border:1px solid var(--border-color);">
-              <div style="color:var(--rose);font-weight:700;">Above 45 Days</div>
-              <div style="font-family:monospace;font-weight:900;font-size:0.95rem;margin-top:0.25rem;color:var(--rose);">₹19,298</div>
+            <div style="background:var(--zoho-bg);border-radius:6px;padding:10px;">
+              <div style="font-size:11px;color:var(--zoho-red);font-weight:500;">Above 45</div>
+              <div style="font-size:13px;font-weight:600;font-family:monospace;margin-top:2px;color:var(--zoho-red);">₹19,298</div>
             </div>
           </div>
         </div>
 
-        <!-- 2. Zoho Sales/Expenses/Receipts Summary Cards -->
-        <div class="zoho-summary-cards">
-          <div class="zoho-summary-card">
-            <div class="z-label">Total Sales *</div>
-            <div class="z-value" style="color:var(--primary);">₹5,71,291</div>
+        <!-- Sales & Expenses + Top Expenses -->
+        <div class="grid-2">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="card-title">Sales and Expenses</div>
+              <div class="toggle"><button class="active">This Fiscal Year</button><button>6 Months</button></div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:8px;height:140px;border-bottom:1px solid var(--zoho-border-light);padding-bottom:4px;">
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:30%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:20%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:12%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:45%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:30%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:16%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:55%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:40%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:22%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:70%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:52%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:28%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:85%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:65%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:35%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:100%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:78%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:42%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:90%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:70%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:38%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+              <div style="flex:1;display:flex;gap:2px;height:100%;align-items:flex-end;"><div style="flex:1;height:95%;background:var(--zoho-blue);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:75%;background:var(--zoho-green);border-radius:2px 2px 0 0;"></div><div style="flex:1;height:40%;background:var(--zoho-amber);border-radius:2px 2px 0 0;"></div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:11px;color:var(--text3);">
+              <span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px;padding-top:12px;border-top:1px solid var(--zoho-border-light);">
+              <div style="text-align:center;"><div class="kpi-label">Total Sales</div><div style="font-size:16px;font-weight:700;font-family:monospace;margin-top:2px;">₹5,71,291</div></div>
+              <div style="text-align:center;"><div class="kpi-label">Total Receipts</div><div style="font-size:16px;font-weight:700;font-family:monospace;margin-top:2px;">₹2,38,073</div></div>
+              <div style="text-align:center;"><div class="kpi-label">Total Expenses</div><div style="font-size:16px;font-weight:700;font-family:monospace;margin-top:2px;">₹1,52,156</div></div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:20px;margin-top:12px;font-size:11px;font-weight:500;color:var(--text2);">
+              <span style="display:flex;align-items:center;gap:5px;"><span style="height:8px;width:8px;border-radius:2px;background:var(--zoho-blue);"></span>Total Sales</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="height:8px;width:8px;border-radius:2px;background:var(--zoho-green);"></span>Total Receipts</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="height:8px;width:8px;border-radius:2px;background:var(--zoho-amber);"></span>Total Expenses</span>
+            </div>
+            <div style="margin-top:8px;font-size:10px;color:var(--text3);">* Sales value displayed is inclusive of tax and inclusive of credits.</div>
           </div>
-          <div class="zoho-summary-card">
-            <div class="z-label">Total Receipts</div>
-            <div class="z-value" style="color:var(--emerald);">₹2,38,073</div>
-          </div>
-          <div class="zoho-summary-card">
-            <div class="z-label">Total Expenses</div>
-            <div class="z-value" style="color:var(--amber);">₹1,52,156</div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="card-title">Top Expenses</div>
+              <span style="font-size:11px;color:var(--text3);">This Fiscal Year</span>
+            </div>
+            <div id="expenses-list"></div>
           </div>
         </div>
-        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:-1rem;margin-bottom:1.5rem;">* Sales value inclusive of tax and inclusive of credits.</div>
 
-        <!-- 3. KPI Grid -->
+        <!-- KPI Grid -->
         <div class="grid-4">
-          <div class="card"><div class="kpi-label">Today's Sales</div><div class="kpi-value" id="kpi-sales">₹1,45,200</div></div>
-          <div class="card"><div class="kpi-label">Cash Collection</div><div class="kpi-value" style="color:var(--emerald);">₹98,400</div></div>
-          <div class="card"><div class="kpi-label">Pending Deliveries</div><div class="kpi-value">12 Stops</div></div>
-          <div class="card"><div class="kpi-label">Stock Value</div><div class="kpi-value">₹18,40,000</div></div>
+          <div class="kpi"><div class="kpi-label">Today's Sales</div><div class="kpi-val">₹1,45,200</div><div class="kpi-trend up">↑ 12% vs yesterday</div></div>
+          <div class="kpi"><div class="kpi-label">Pending Deliveries</div><div class="kpi-val">12</div></div>
+          <div class="kpi"><div class="kpi-label">Cash Collection</div><div class="kpi-val">₹98,400</div><div class="kpi-trend up">↑ 8% vs target</div></div>
+          <div class="kpi"><div class="kpi-label">Outstanding Dues</div><div class="kpi-val">₹4,82,450</div><div class="kpi-trend down">↓ 3% over due</div></div>
         </div>
 
-        <!-- 4. Sales & Expenses Chart (Bar) + Sales/Receipts/Dues Matrix -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.5rem;margin-bottom:1.5rem;">
-
-          <!-- Sales & Expenses Chart -->
-          <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;border-bottom:1px solid var(--border-color);padding-bottom:0.75rem;margin-bottom:1rem;">
-                <h3 style="font-size:1.05rem;font-weight:900;">Sales and Expenses</h3>
-                <div style="display:flex;gap:0.4rem;">
-                  <button type="button" class="pill" style="font-size:0.7rem;padding:0.3rem 0.6rem;" id="fy-btn" onclick="setChartPeriod('fy')">This Fiscal Year</button>
-                  <button type="button" class="pill" style="font-size:0.7rem;padding:0.3rem 0.6rem;" id="6m-btn" onclick="setChartPeriod('6m')">6 Months</button>
-                </div>
-              </div>
-              <div style="display:flex;align-items:flex-end;gap:0.75rem;height:160px;padding:0.5rem 0;border-bottom:1px solid var(--border-color);">
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-                  <div style="display:flex;gap:2px;height:100%;align-items:flex-end;width:100%;">
-                    <div style="flex:1;height:30%;background:var(--primary);border-radius:3px 3px 0 0;" title="Apr Sales: ₹32K"></div>
-                    <div style="flex:1;height:20%;background:var(--emerald);border-radius:3px 3px 0 0;" title="Apr Receipts: ₹22K"></div>
-                    <div style="flex:1;height:12%;background:var(--amber);border-radius:3px 3px 0 0;" title="Apr Expenses: ₹14K"></div>
-                  </div>
-                  <span style="font-size:0.7rem;font-weight:bold;">Apr</span>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-                  <div style="display:flex;gap:2px;height:100%;align-items:flex-end;width:100%;">
-                    <div style="flex:1;height:40%;background:var(--primary);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:28%;background:var(--emerald);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:15%;background:var(--amber);border-radius:3px 3px 0 0;"></div>
-                  </div>
-                  <span style="font-size:0.7rem;font-weight:bold;">May</span>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-                  <div style="display:flex;gap:2px;height:100%;align-items:flex-end;width:100%;">
-                    <div style="flex:1;height:55%;background:var(--primary);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:38%;background:var(--emerald);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:22%;background:var(--amber);border-radius:3px 3px 0 0;"></div>
-                  </div>
-                  <span style="font-size:0.7rem;font-weight:bold;">Jun</span>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-                  <div style="display:flex;gap:2px;height:100%;align-items:flex-end;width:100%;">
-                    <div style="flex:1;height:70%;background:var(--primary);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:50%;background:var(--emerald);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:28%;background:var(--amber);border-radius:3px 3px 0 0;"></div>
-                  </div>
-                  <span style="font-size:0.7rem;font-weight:bold;">Jul</span>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-                  <div style="display:flex;gap:2px;height:100%;align-items:flex-end;width:100%;">
-                    <div style="flex:1;height:85%;background:var(--primary);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:62%;background:var(--emerald);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:35%;background:var(--amber);border-radius:3px 3px 0 0;"></div>
-                  </div>
-                  <span style="font-size:0.7rem;font-weight:bold;">Aug</span>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-                  <div style="display:flex;gap:2px;height:100%;align-items:flex-end;width:100%;">
-                    <div style="flex:1;height:100%;background:var(--primary);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:75%;background:var(--emerald);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:40%;background:var(--amber);border-radius:3px 3px 0 0;"></div>
-                  </div>
-                  <span style="font-size:0.7rem;font-weight:bold;">Sep</span>
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
-                  <div style="display:flex;gap:2px;height:100%;align-items:flex-end;width:100%;">
-                    <div style="flex:1;height:90%;background:var(--primary);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:68%;background:var(--emerald);border-radius:3px 3px 0 0;"></div>
-                    <div style="flex:1;height:38%;background:var(--amber);border-radius:3px 3px 0 0;"></div>
-                  </div>
-                  <span style="font-size:0.7rem;font-weight:bold;">Oct</span>
-                </div>
-              </div>
-              <div style="display:flex;justify-content:center;gap:1.25rem;font-size:0.72rem;font-weight:bold;margin-top:0.65rem;">
-                <span style="display:flex;align-items:center;gap:0.35rem;"><span style="height:9px;width:9px;border-radius:2px;background:var(--primary);"></span>Total Sales ₹5,71,291</span>
-                <span style="display:flex;align-items:center;gap:0.35rem;"><span style="height:9px;width:9px;border-radius:2px;background:var(--emerald);"></span>Total Receipts ₹2,38,073</span>
-                <span style="display:flex;align-items:center;gap:0.35rem;"><span style="height:9px;width:9px;border-radius:2px;background:var(--amber);"></span>Total Expenses ₹1,52,156</span>
-              </div>
-            </div>
+        <!-- Sales, Receipts & Dues -->
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--zoho-border-light);">
+            <div class="card-title">Sales, Receipts, and Dues</div>
           </div>
-
-          <!-- Sales, Receipts & Dues Matrix -->
-          <div class="tbl-wrap" style="margin-bottom:0;padding:1.25rem;">
-            <h3 style="font-size:1.05rem;font-weight:900;margin-bottom:0.25rem;">Sales, Receipts, and Dues</h3>
-            <p style="font-size:0.78rem;color:var(--text-sub);margin-bottom:1rem;">Period comparison across sales, collections, and net due.</p>
-            <table>
-              <thead><tr><th>Period</th><th style="text-align:right;">Sales</th><th style="text-align:right;">Receipts</th><th style="text-align:right;">Due</th></tr></thead>
-              <tbody>
-                <tr><td><strong>Today</strong></td><td style="text-align:right;font-family:monospace;">₹1,45,200</td><td style="text-align:right;font-family:monospace;color:var(--emerald);">₹98,400</td><td style="text-align:right;font-family:monospace;color:var(--rose);font-weight:800;">₹46,800</td></tr>
-                <tr><td><strong>This Week</strong></td><td style="text-align:right;font-family:monospace;">₹6,96,960</td><td style="text-align:right;font-family:monospace;color:var(--emerald);">₹4,52,640</td><td style="text-align:right;font-family:monospace;color:var(--rose);font-weight:800;">₹2,44,320</td></tr>
-                <tr><td><strong>This Month</strong></td><td style="text-align:right;font-family:monospace;">₹27,87,840</td><td style="text-align:right;font-family:monospace;color:var(--emerald);">₹18,20,400</td><td style="text-align:right;font-family:monospace;color:var(--rose);font-weight:800;">₹9,67,440</td></tr>
-                <tr><td><strong>This Quarter</strong></td><td style="text-align:right;font-family:monospace;">₹79,13,400</td><td style="text-align:right;font-family:monospace;color:var(--emerald);">₹50,30,400</td><td style="text-align:right;font-family:monospace;color:var(--rose);font-weight:800;">₹28,83,000</td></tr>
-                <tr><td><strong>This Year</strong></td><td style="text-align:right;font-family:monospace;">₹2,78,78,400</td><td style="text-align:right;font-family:monospace;color:var(--emerald);">₹1,78,48,000</td><td style="text-align:right;font-family:monospace;color:var(--rose);font-weight:800;">₹1,00,30,400</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 5. Top Expenses Widget -->
-        <div class="card" style="margin-bottom:1.5rem;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
-            <h3 style="font-size:1.05rem;font-weight:900;">Top Expenses</h3>
-            <span class="pill" style="font-size:0.7rem;padding:0.3rem 0.6rem;cursor:default;">This Fiscal Year</span>
-          </div>
-          <div id="expense-bars" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
-        </div>
-
-      </div><!-- end dashboard-tab -->
-
-      <!-- TAB 2: Vyapar POS Studio -->
-      <div id="pos-tab" class="tab-content">
-        <div class="pos-studio">
-          <div class="pos-tabs-bar">
-            <div style="display:flex;align-items:center;gap:0.5rem;">
-              <div class="pos-tab active" onclick="selectPosTab(this,1)">Sale #1 <span style="opacity:0.5;">✕</span></div>
-              <div class="pos-tab" onclick="selectPosTab(this,2)">Sale #2 <span style="opacity:0.5;">✕</span></div>
-              <button type="button" class="hamburger-btn" style="padding:0.35rem 0.7rem;font-size:0.95rem;" onclick="addPosTab()">+</button>
-            </div>
-            <span style="font-size:0.75rem;font-weight:800;color:var(--text-muted);">⚡ Instant POS & Ledger Posting</span>
-          </div>
-
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem;">
-            <div style="display:flex;align-items:center;gap:1.25rem;">
-              <h2 style="font-size:1.65rem;font-weight:900;">Sale</h2>
-              <div class="credit-cash-switch">
-                <button type="button" onclick="setBillingMode('credit')">Credit</button>
-                <button type="button" class="active-cash" onclick="setBillingMode('cash')">Cash</button>
-              </div>
-            </div>
-            <span style="font-size:0.8rem;font-weight:700;color:var(--emerald);">✔ Active Retailer Account</span>
-          </div>
-
-          <div class="party-grid">
-            <div class="form-group" style="grid-column:span 2;"><label>Search by Name/Phone *</label>
-              <select class="form-control" id="pos-retailer-select">
-                <option>Retailer One (Boring Road, Patna) — +91 99999 99999</option>
-                <option>Retailer Two (Kankarbagh, Patna) — +91 88888 88888</option>
-                <option>General Walk-in Customer — +91 90000 00000</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Phone No.</label><input class="form-control" value="+91 99999 99999" /></div>
-            <div class="form-group"><label>Invoice Number</label><input class="form-control" id="pos-inv-no" value="INV-2026-0102" readonly style="font-family:monospace;font-weight:800;text-align:center;" /></div>
-            <div class="form-group"><label>Invoice Date</label><input type="date" class="form-control" value="2026-07-25" /></div>
-            <div class="form-group"><label>State of supply</label>
-              <select class="form-control"><option>10 - Bihar</option><option>09 - Uttar Pradesh</option><option>29 - Karnataka</option></select>
-            </div>
-          </div>
-
-          <div class="tbl-wrap">
-            <table id="pos-grid-table">
-              <thead><tr><th style="width:40px;text-align:center;">#</th><th style="min-width:200px;">ITEM</th><th style="width:80px;text-align:center;">QTY</th><th style="width:80px;text-align:center;">UNIT</th><th style="width:120px;text-align:right;">PRICE/UNIT</th><th style="width:100px;text-align:center;">DISCOUNT</th><th style="width:100px;text-align:center;">TAX (%)</th><th style="width:120px;text-align:right;">AMOUNT</th><th style="width:40px;text-align:center;">✕</th></tr></thead>
-              <tbody id="pos-tbody">
-                <tr>
-                  <td style="text-align:center;font-weight:800;font-family:monospace;">1</td>
-                  <td><select onchange="recalculatePos()" class="form-control"><option data-price="28" data-tax="5" data-unit="Pouch">Sudha Gold Full Cream Milk 500ml</option><option data-price="80" data-tax="5" data-unit="Pouch">Sudha Cow Milk 1 Ltr</option><option data-price="35" data-tax="12" data-unit="Box">Sudha Plain Curd 200g</option></select></td>
-                  <td><input type="number" value="20" min="1" class="qty-input" oninput="recalculatePos()" style="text-align:center;" /></td>
-                  <td><input type="text" value="Pouch" readonly style="text-align:center;font-size:0.75rem;" /></td>
-                  <td><input type="number" value="28.00" min="0" step="0.5" class="price-input" oninput="recalculatePos()" style="text-align:right;font-family:monospace;" /></td>
-                  <td><input type="number" value="10.00" min="0" step="1" class="disc-input" oninput="recalculatePos()" style="text-align:center;" /></td>
-                  <td><select class="tax-select" onchange="recalculatePos()"><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option></select></td>
-                  <td style="text-align:right;font-weight:800;font-family:monospace;" class="line-total-cell">₹577.50</td>
-                  <td style="text-align:center;"><button type="button" onclick="removeRow(this)" style="background:transparent;border:none;color:var(--rose);font-weight:900;cursor:pointer;">✕</button></td>
-                </tr>
-              </tbody>
-            </table>
-            <div style="padding:0.75rem 1rem;background:var(--bg-sub);border-top:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
-              <button type="button" class="pill primary" style="font-size:0.8rem;" onclick="addPosRow()">+ ADD ROW</button>
-              <div style="display:flex;gap:1.5rem;font-size:0.85rem;font-weight:800;">
-                <span>Total Qty: <strong id="lbl-total-qty">20</strong></span>
-                <span>Subtotal: <strong id="lbl-subtotal" style="font-family:monospace;">₹560.00</strong></span>
-                <span>Tax: <strong id="lbl-tax" style="font-family:monospace;color:var(--primary);">₹27.50</strong></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pos-footer">
-            <div style="flex:2;min-width:260px;display:flex;flex-direction:column;gap:0.75rem;">
-              <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                <button type="button" class="pill" onclick="toggleSection('terms-box')">☰ Terms</button>
-                <button type="button" class="pill" onclick="toggleSection('notes-box')">📄 Remarks</button>
-              </div>
-              <div id="terms-box"><label style="font-size:0.7rem;font-weight:800;color:var(--text-sub);display:block;margin-bottom:0.25rem;">Terms & Conditions</label><textarea class="form-control" rows="2">1. Goods once sold will not be taken back. 2. Interest @ 18% p.a. on overdue balances.</textarea></div>
-              <div id="notes-box" style="display:none;"><label style="font-size:0.7rem;font-weight:800;color:var(--text-sub);display:block;margin-bottom:0.25rem;">Remarks</label><textarea class="form-control" rows="2" placeholder="Delivery notes..."></textarea></div>
-            </div>
-            <div class="pos-totals-box">
-              <div class="total-row">
-                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;"><input type="checkbox" id="chk-roundoff" checked onchange="recalculatePos()" /> Round Off</label>
-                <span id="lbl-roundoff-delta" style="font-family:monospace;">-0.50</span>
-              </div>
-              <div class="grand-total-row"><span>GRAND TOTAL</span><span id="lbl-grand-total">₹587.00</span></div>
-              <button type="button" class="save-btn" onclick="saveAndPostInvoice()">⚡ SAVE & POST INVOICE</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: Tally Print Layouts -->
-      <div id="print-tab" class="tab-content">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem;">
-          <div><h2 style="font-size:1.5rem;font-weight:900;">Tally & Thermal Print Layouts</h2><p style="font-size:0.85rem;color:var(--text-sub);">Preview printable output with company header and GSTIN.</p></div>
-          <div style="display:flex;gap:0.5rem;">
-            <button type="button" class="pill primary" onclick="alert('Print dialog launched!')">🖨️ Print</button>
-            <button type="button" class="pill" onclick="alert('PDF downloaded!')">📥 Download PDF</button>
-          </div>
-        </div>
-        <div class="tally-preview-box">
-          <div class="tally-header">
-            <h1 style="font-size:1.4rem;font-weight:900;margin-bottom:0.25rem;">Sudha Dairy Distributor Patna</h1>
-            <div style="font-size:0.8rem;">Plot No. 12, Boring Road, Patna, Bihar - 800001</div>
-            <div style="font-size:0.8rem;font-weight:bold;margin-top:0.25rem;">GSTIN: 10ABCDE1234F1Z5 | Phone: +91 91234 56789</div>
-            <h3 style="margin-top:0.75rem;text-decoration:underline;">TAX INVOICE</h3>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:1rem;font-size:0.8rem;">
-            <div><strong>Bill To:</strong><br/>Retailer One (Shop #1)<br/>Boring Road, Patna<br/>Phone: +91 99999 99999</div>
-            <div style="text-align:right;"><strong>Invoice Details:</strong><br/>Invoice No: <strong>INV-2026-0102</strong><br/>Date: 25-07-2026<br/>State: 10 - Bihar</div>
-          </div>
-          <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.8rem;">
-            <thead><tr style="background:#f0f0f0;"><th style="border:1px solid #000;padding:0.4rem;">#</th><th style="border:1px solid #000;padding:0.4rem;">Description</th><th style="border:1px solid #000;padding:0.4rem;">HSN</th><th style="border:1px solid #000;padding:0.4rem;">Qty</th><th style="border:1px solid #000;padding:0.4rem;">Rate</th><th style="border:1px solid #000;padding:0.4rem;">Tax</th><th style="border:1px solid #000;padding:0.4rem;">Amount</th></tr></thead>
-            <tbody><tr><td style="border:1px solid #000;padding:0.4rem;text-align:center;">1</td><td style="border:1px solid #000;padding:0.4rem;">Sudha Gold Full Cream Milk 500ml</td><td style="border:1px solid #000;padding:0.4rem;text-align:center;">0401</td><td style="border:1px solid #000;padding:0.4rem;text-align:center;">20 Pouch</td><td style="border:1px solid #000;padding:0.4rem;text-align:right;">28.00</td><td style="border:1px solid #000;padding:0.4rem;text-align:center;">5%</td><td style="border:1px solid #000;padding:0.4rem;text-align:right;">577.50</td></tr></tbody>
-            <tfoot><tr style="font-weight:bold;"><td colspan="3" style="border:1px solid #000;padding:0.4rem;text-align:right;">Total</td><td style="border:1px solid #000;padding:0.4rem;text-align:center;">20</td><td colspan="2" style="border:1px solid #000;padding:0.4rem;"></td><td style="border:1px solid #000;padding:0.4rem;text-align:right;">₹587.00</td></tr></tfoot>
-          </table>
-          <div style="font-size:0.8rem;margin-top:1rem;display:flex;justify-content:space-between;align-items:end;">
-            <div>
-              <div>Amount in Words: <strong>Five Hundred and Eighty Seven Rupees Only</strong></div>
-              <div style="margin-top:0.5rem;font-size:0.75rem;">Terms: 1. Goods once sold will not be taken back. 2. Interest @ 18% p.a. on overdue.</div>
-            </div>
-            <div style="text-align:center;border-top:1px solid #000;padding-top:0.25rem;width:180px;">For Sudha Dairy Distributor<br/><br/><strong>Authorized Signatory</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 4: Retailers Directory -->
-      <div id="retailers-tab" class="tab-content">
-        <div style="margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center;">
-          <div><h2 style="font-size:1.5rem;font-weight:900;">Retailers & Shop Directory</h2><p style="font-size:0.85rem;color:var(--text-sub);">Onboard shops, assign credit, manage ledger.</p></div>
-          <button type="button" class="pill primary" onclick="alert('Add Retailer Modal!')">+ Onboard Retailer</button>
-        </div>
-        <div class="tbl-wrap">
           <table>
-            <thead><tr><th>Code</th><th>Shop Name</th><th>Mobile</th><th>Credit Limit</th><th>Outstanding</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th></th><th style="text-align:right;">Sales</th><th style="text-align:right;">Receipts</th><th style="text-align:right;">Due</th></tr></thead>
             <tbody>
-              <tr><td style="font-family:monospace;font-weight:bold;">RET-001</td><td><strong>Retailer One</strong><br/><span style="font-size:0.75rem;color:var(--text-sub);">Boring Road, Patna</span></td><td>+91 99999 99999</td><td>₹50,000</td><td style="font-weight:bold;color:var(--rose);">₹12,450</td><td><span style="background:var(--emerald-light);color:var(--emerald);padding:0.2rem 0.5rem;border-radius:0.4rem;font-size:0.7rem;font-weight:800;">Active</span></td><td><button type="button" class="pill" onclick="switchTab('pos-tab',document.querySelectorAll('.nav-list a')[1])">Billing</button></td></tr>
-              <tr><td style="font-family:monospace;font-weight:bold;">RET-002</td><td><strong>Retailer Two</strong><br/><span style="font-size:0.75rem;color:var(--text-sub);">Kankarbagh, Patna</span></td><td>+91 88888 88888</td><td>₹35,000</td><td style="font-weight:bold;color:var(--rose);">₹8,200</td><td><span style="background:var(--emerald-light);color:var(--emerald);padding:0.2rem 0.5rem;border-radius:0.4rem;font-size:0.7rem;font-weight:800;">Active</span></td><td><button type="button" class="pill" onclick="switchTab('pos-tab',document.querySelectorAll('.nav-list a')[1])">Billing</button></td></tr>
+              <tr><td style="font-weight:600;">Today</td><td style="text-align:right;font-family:monospace;color:var(--zoho-blue);">₹1,45,200</td><td style="text-align:right;font-family:monospace;">₹98,400</td><td style="text-align:right;font-family:monospace;font-weight:600;">₹46,800</td></tr>
+              <tr><td style="font-weight:600;">This Week</td><td style="text-align:right;font-family:monospace;color:var(--zoho-blue);">₹6,96,960</td><td style="text-align:right;font-family:monospace;">₹4,52,640</td><td style="text-align:right;font-family:monospace;font-weight:600;">₹2,44,320</td></tr>
+              <tr><td style="font-weight:600;">This Month</td><td style="text-align:right;font-family:monospace;color:var(--zoho-blue);">₹27,87,840</td><td style="text-align:right;font-family:monospace;">₹18,20,400</td><td style="text-align:right;font-family:monospace;font-weight:600;">₹9,67,440</td></tr>
+              <tr><td style="font-weight:600;">This Quarter</td><td style="text-align:right;font-family:monospace;color:var(--zoho-blue);">₹79,13,400</td><td style="text-align:right;font-family:monospace;">₹50,30,400</td><td style="text-align:right;font-family:monospace;font-weight:600;">₹28,83,000</td></tr>
+              <tr><td style="font-weight:600;">This Year</td><td style="text-align:right;font-family:monospace;color:var(--zoho-blue);">₹2,78,78,400</td><td style="text-align:right;font-family:monospace;">₹1,78,48,000</td><td style="text-align:right;font-family:monospace;font-weight:600;">₹1,00,30,400</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- TAB 5: Products & Stock -->
-      <div id="products-tab" class="tab-content">
-        <div style="margin-bottom:1.25rem;"><h2 style="font-size:1.5rem;font-weight:900;">Products & Variant Catalog</h2><p style="font-size:0.85rem;color:var(--text-sub);">Manage MRP, distributor prices, and live batch stock.</p></div>
-        <div class="tbl-wrap">
+      <!-- POS -->
+      <div id="pos" class="tab">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--zoho-border-light);">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="pos-tab active">Sale #1 <span style="opacity:0.5;">✕</span></span>
+              <span class="pos-tab">Sale #2 <span style="opacity:0.5;">✕</span></span>
+              <button class="btn" style="padding:4px 10px;font-size:14px;">+</button>
+            </div>
+            <span style="font-size:12px;color:var(--text3);">Instant POS & Ledger Posting</span>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <h2 style="font-size:22px;font-weight:700;">Sale</h2>
+              <div class="cc-sw"><button onclick="this.className='act';this.nextElementSibling.className=''">Credit</button><button class="act" onclick="this.className='';this.previousElementSibling.className='act'">Cash</button></div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--zoho-green);">Active Retailer Account</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
+            <div style="grid-column:span 2;"><label>Search by Name/Phone *</label><select><option>Retailer One (Boring Road, Patna) — 99999 99999</option><option>Retailer Two (Kankarbagh) — 88888 88888</option><option>Walk-in Customer — 90000 00000</option></select></div>
+            <div><label>Phone No.</label><input value="+91 99999 99999" /></div>
+            <div><label>Invoice Number</label><input value="INV-2026-0102" readonly style="font-family:monospace;font-weight:600;text-align:center;" /></div>
+            <div><label>Invoice Date</label><input type="date" value="2026-07-25" /></div>
+            <div><label>State of Supply</label><select><option>10 - Bihar</option><option>09 - Uttar Pradesh</option></select></div>
+          </div>
+
+          <table style="margin-bottom:0;">
+            <thead><tr><th style="width:40px;text-align:center;">#</th><th>ITEM</th><th style="width:70px;text-align:center;">QTY</th><th style="width:70px;text-align:center;">UNIT</th><th style="width:110px;text-align:right;">PRICE</th><th style="width:90px;text-align:center;">DISC</th><th style="width:90px;text-align:center;">TAX</th><th style="width:110px;text-align:right;">AMOUNT</th><th style="width:36px;text-align:center;"></th></tr></thead>
+            <tbody id="pos-tbody">
+              <tr>
+                <td style="text-align:center;font-family:monospace;font-weight:600;">1</td>
+                <td><select onchange="calc()" style="width:100%;"><option data-p="28" data-t="5" data-u="Pouch">Sudha Gold Full Cream 500ml</option><option data-p="80" data-t="5" data-u="Pouch">Sudha Cow Milk 1L</option><option data-p="35" data-t="12" data-u="Box">Sudha Plain Curd 200g</option></select></td>
+                <td><input type="number" value="20" min="1" class="q" oninput="calc()" style="text-align:center;" /></td>
+                <td><input value="Pouch" readonly style="text-align:center;font-size:12px;" /></td>
+                <td><input type="number" value="28" min="0" step="0.5" class="p" oninput="calc()" style="text-align:right;font-family:monospace;" /></td>
+                <td><input type="number" value="10" min="0" class="d" oninput="calc()" style="text-align:center;" /></td>
+                <td><select class="t" onchange="calc()"><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option></select></td>
+                <td style="text-align:right;font-weight:600;font-family:monospace;" class="lt">₹577.50</td>
+                <td style="text-align:center;"><button onclick="rm(this)" style="background:none;border:none;color:var(--zoho-red);cursor:pointer;font-weight:700;">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 12px;background:var(--zoho-bg);border-top:1px solid var(--zoho-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <button class="btn primary" onclick="addRow()" style="font-size:12px;">+ Add Row</button>
+            <div style="display:flex;gap:16px;font-size:13px;font-weight:600;">
+              <span>Qty: <strong id="lq">20</strong></span>
+              <span>Sub: <strong id="ls" style="font-family:monospace;">₹560.00</strong></span>
+              <span>Tax: <strong id="lt" style="font-family:monospace;color:var(--zoho-blue);">₹27.50</strong></span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;">
+            <div style="flex:2;min-width:240px;">
+              <label>Terms & Conditions</label>
+              <textarea rows="2">1. Goods once sold will not be taken back. 2. Interest @ 18% p.a. on overdue.</textarea>
+            </div>
+            <div style="flex:1;min-width:220px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:8px;">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="ro" checked onchange="calc()" /> Round Off</label>
+                <span id="lro" style="font-family:monospace;">-0.50</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700;padding:8px 0;border-top:2px solid var(--zoho-border);">
+                <span>Grand Total</span><span id="lgt" style="font-family:monospace;">₹587.00</span>
+              </div>
+              <button class="save-btn" onclick="saveInv()">Save & Post Invoice</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRINT -->
+      <div id="print" class="tab">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+          <div><h2 style="font-size:18px;font-weight:600;">Print Layouts</h2><p style="font-size:13px;color:var(--text3);">Preview with company header and GSTIN.</p></div>
+          <div style="display:flex;gap:8px;"><button class="btn primary">Print</button><button class="btn">Download PDF</button></div>
+        </div>
+        <div class="tally">
+          <div class="tally-hdr">
+            <h1 style="font-size:18px;font-weight:700;margin-bottom:4px;">Sudha Dairy Distributor Patna</h1>
+            <div style="font-size:12px;">Plot No. 12, Boring Road, Patna, Bihar - 800001</div>
+            <div style="font-size:12px;font-weight:600;margin-top:4px;">GSTIN: 10ABCDE1234F1Z5 | Phone: +91 91234 56789</div>
+            <h3 style="margin-top:12px;text-decoration:underline;">TAX INVOICE</h3>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:12px;">
+            <div><strong>Bill To:</strong><br/>Retailer One (Shop #1)<br/>Boring Road, Patna<br/>Phone: +91 99999 99999</div>
+            <div style="text-align:right;"><strong>Invoice:</strong><br/>INV-2026-0102<br/>Date: 25-07-2026<br/>State: 10 - Bihar</div>
+          </div>
+          <table style="border:1px solid #000;margin:16px 0;font-size:12px;">
+            <thead><tr style="background:#f0f0f0;"><th style="border:1px solid #000;padding:6px;">#</th><th style="border:1px solid #000;padding:6px;">Description</th><th style="border:1px solid #000;padding:6px;">HSN</th><th style="border:1px solid #000;padding:6px;">Qty</th><th style="border:1px solid #000;padding:6px;">Rate</th><th style="border:1px solid #000;padding:6px;">Tax</th><th style="border:1px solid #000;padding:6px;">Amount</th></tr></thead>
+            <tbody><tr><td style="border:1px solid #000;padding:6px;text-align:center;">1</td><td style="border:1px solid #000;padding:6px;">Sudha Gold Full Cream Milk 500ml</td><td style="border:1px solid #000;padding:6px;text-align:center;">0401</td><td style="border:1px solid #000;padding:6px;text-align:center;">20 Pouch</td><td style="border:1px solid #000;padding:6px;text-align:right;">28.00</td><td style="border:1px solid #000;padding:6px;text-align:center;">5%</td><td style="border:1px solid #000;padding:6px;text-align:right;">577.50</td></tr></tbody>
+            <tfoot><tr style="font-weight:700;"><td colspan="3" style="border:1px solid #000;padding:6px;text-align:right;">Total</td><td style="border:1px solid #000;padding:6px;text-align:center;">20</td><td colspan="2" style="border:1px solid #000;padding:6px;"></td><td style="border:1px solid #000;padding:6px;text-align:right;">₹587.00</td></tr></tfoot>
+          </table>
+          <div style="font-size:12px;margin-top:16px;display:flex;justify-content:space-between;align-items:end;">
+            <div><div>Amount in Words: <strong>Five Hundred Eighty Seven Rupees Only</strong></div><div style="margin-top:8px;font-size:11px;">Terms: 1. Goods once sold will not be taken back. 2. Interest @ 18% p.a.</div></div>
+            <div style="text-align:center;border-top:1px solid #000;padding-top:4px;width:160px;">For Sudha Dairy Distributor<br/><br/><strong>Authorized Signatory</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RETAILERS -->
+      <div id="retailers" class="tab">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div><h2 style="font-size:18px;font-weight:600;">Retailers</h2><p style="font-size:13px;color:var(--text3);">Manage shops, credit limits, and ledger.</p></div>
+          <button class="btn primary">+ New Retailer</button>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table>
+            <thead><tr><th>Code</th><th>Shop Name</th><th>Mobile</th><th>Credit Limit</th><th>Outstanding</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;font-weight:600;">RET-001</td><td><strong>Retailer One</strong><br/><span style="font-size:11px;color:var(--text3);">Boring Road, Patna</span></td><td>+91 99999 99999</td><td>₹50,000</td><td style="font-weight:600;color:var(--zoho-red);">₹12,450</td><td><span class="tag tag-green">Active</span></td><td><button class="btn" style="padding:4px 10px;font-size:12px;" onclick="switchTab('pos',document.querySelectorAll('.sb-item')[1])">Bill</button></td></tr>
+              <tr><td style="font-family:monospace;font-weight:600;">RET-002</td><td><strong>Retailer Two</strong><br/><span style="font-size:11px;color:var(--text3);">Kankarbagh, Patna</span></td><td>+91 88888 88888</td><td>₹35,000</td><td style="font-weight:600;color:var(--zoho-red);">₹8,200</td><td><span class="tag tag-green">Active</span></td><td><button class="btn" style="padding:4px 10px;font-size:12px;" onclick="switchTab('pos',document.querySelectorAll('.sb-item')[1])">Bill</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="products" class="tab">
+        <div style="margin-bottom:16px;"><h2 style="font-size:18px;font-weight:600;">Products</h2><p style="font-size:13px;color:var(--text3);">Manage MRP, distributor prices, and stock.</p></div>
+        <div class="card" style="padding:0;overflow:hidden;">
           <table>
             <thead><tr><th>SKU</th><th>Product Name</th><th>Unit</th><th>Price</th><th>GST</th><th>Stock</th></tr></thead>
             <tbody>
-              <tr><td style="font-family:monospace;font-weight:bold;">MILK-FC-500</td><td><strong>Sudha Gold Full Cream Milk 500ml</strong></td><td>Pouch</td><td>₹28.00</td><td>5%</td><td style="font-weight:bold;color:var(--emerald);">1,450</td></tr>
-              <tr><td style="font-family:monospace;font-weight:bold;">MILK-CW-1000</td><td><strong>Sudha Cow Milk 1 Ltr</strong></td><td>Pouch</td><td>₹80.00</td><td>5%</td><td style="font-weight:bold;color:var(--emerald);">820</td></tr>
-              <tr><td style="font-family:monospace;font-weight:bold;">CURD-PL-200</td><td><strong>Sudha Plain Curd 200g</strong></td><td>Box</td><td>₹35.00</td><td>12%</td><td style="font-weight:bold;color:var(--amber);">310</td></tr>
+              <tr><td style="font-family:monospace;font-weight:600;">MILK-FC-500</td><td><strong>Sudha Gold Full Cream 500ml</strong></td><td>Pouch</td><td>₹28.00</td><td>5%</td><td style="font-weight:600;color:var(--zoho-green);">1,450</td></tr>
+              <tr><td style="font-family:monospace;font-weight:600;">MILK-CW-1000</td><td><strong>Sudha Cow Milk 1L</strong></td><td>Pouch</td><td>₹80.00</td><td>5%</td><td style="font-weight:600;color:var(--zoho-green);">820</td></tr>
+              <tr><td style="font-family:monospace;font-weight:600;">CURD-PL-200</td><td><strong>Sudha Plain Curd 200g</strong></td><td>Box</td><td>₹35.00</td><td>12%</td><td style="font-weight:600;color:var(--zoho-amber);">310</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- TAB 6: Settings Hub -->
-      <div id="settings-tab" class="tab-content">
-        <div style="margin-bottom:1.25rem;"><h2 style="font-size:1.5rem;font-weight:900;">System Settings & Theme Hub</h2><p style="font-size:0.85rem;color:var(--text-sub);">Manage appearance, company info, and GST configuration.</p></div>
-        <div class="card" style="margin-bottom:1.5rem;">
-          <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:0.75rem;">Appearance & Theme Mode</h3>
-          <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-            <button type="button" class="pill primary" style="padding:0.75rem 1.5rem;" onclick="setTheme('light')">☀ Light Mode</button>
-            <button type="button" class="pill" style="padding:0.75rem 1.5rem;" onclick="setTheme('dark')">🌙 Dark Mode</button>
+      <!-- SETTINGS -->
+      <div id="settings" class="tab">
+        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px;">Settings</h2>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Appearance</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn" onclick="setT('light')">☀ Light Mode</button>
+            <button class="btn" onclick="setT('dark')">🌙 Dark Mode</button>
           </div>
         </div>
-        <div class="card" style="margin-bottom:1.5rem;">
-          <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:1rem;">Company & GST Information</h3>
-          <div class="party-grid">
-            <div class="form-group"><label>Company Name</label><input class="form-control" value="Sudha Dairy Distributor Patna" /></div>
-            <div class="form-group"><label>Legal Name</label><input class="form-control" value="Sudha Dairy Distributor Pvt Ltd" /></div>
-            <div class="form-group"><label>GSTIN</label><input class="form-control" value="10ABCDE1234F1Z5" style="font-family:monospace;" /></div>
-            <div class="form-group"><label>PAN</label><input class="form-control" value="ABCDE1234F" style="font-family:monospace;" /></div>
-            <div class="form-group"><label>Phone</label><input class="form-control" value="+91 91234 56789" /></div>
-            <div class="form-group"><label>Email</label><input class="form-control" value="admin@sudhadairy.in" /></div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px;">Company Profile & GST</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+            <div><label>Trade Name</label><input value="Sudha Dairy Distributor Patna" /></div>
+            <div><label>Legal Name</label><input value="Sudha Dairy Distributor Pvt Ltd" /></div>
+            <div><label>GSTIN</label><input value="10ABCDE1234F1Z5" style="font-family:monospace;" /></div>
+            <div><label>PAN</label><input value="ABCDE1234F" style="font-family:monospace;" /></div>
+            <div><label>Phone</label><input value="+91 91234 56789" /></div>
+            <div><label>Email</label><input value="admin@sudhadairy.in" /></div>
           </div>
-          <div style="margin-top:1rem;"><label style="font-size:0.7rem;font-weight:800;color:var(--text-sub);display:block;margin-bottom:0.3rem;">Address</label><textarea class="form-control" rows="2">Plot No. 12, Shop No. 4, Boring Road, Patna, Bihar - 800001</textarea></div>
-          <div style="margin-top:1rem;"><button type="button" class="pill primary">💾 Save Company Settings</button></div>
+          <div style="margin-top:12px;"><label>Address</label><textarea rows="2">Plot No. 12, Shop No. 4, Boring Road, Patna, Bihar - 800001</textarea></div>
+          <div style="margin-top:12px;"><button class="btn primary">Save</button></div>
         </div>
       </div>
-
     </main>
   </div>
 
   <script>
-    // Theme
-    let currentTheme = 'light';
-    function toggleTheme() { setTheme(currentTheme === 'light' ? 'dark' : 'light'); }
-    function setTheme(m) {
-      currentTheme = m;
-      if (m === 'dark') { document.documentElement.setAttribute('data-theme','dark'); document.getElementById('theme-btn-text').innerText='☀ Switch to Light Mode'; }
-      else { document.documentElement.removeAttribute('data-theme'); document.getElementById('theme-btn-text').innerText='🌙 Switch to Dark Mode'; }
-    }
+    let ct='light';
+    function toggleTheme(){setT(ct==='light'?'dark':'light')}
+    function setT(m){ct=m;if(m==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').textContent='☀';document.getElementById('theme-txt').textContent='Light Mode'}else{document.documentElement.removeAttribute('data-theme');document.getElementById('theme-icon').textContent='🌙';document.getElementById('theme-txt').textContent='Dark Mode'}}
 
-    // Sidebar
-    let isCollapsed = false;
-    function toggleSidebar() { isCollapsed = !isCollapsed; document.getElementById('sidebar').classList.toggle('collapsed', isCollapsed); }
+    let collapsed=false;
+    function toggleSidebar(){collapsed=!collapsed;document.getElementById('sidebar').classList.toggle('collapsed',collapsed)}
 
-    // Tabs
-    function switchTab(id, el) {
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    function switchTab(id,el){
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      if (el && el.classList) el.classList.add('active');
-      const t = {'dashboard-tab':'Executive Dashboard','pos-tab':'Vyapar POS Studio','print-tab':'Tally Print Layouts','retailers-tab':'Retailers Directory','products-tab':'Products & Stock','settings-tab':'System Settings Hub'};
-      document.getElementById('page-title').innerText = t[id] || 'Sudha Dairy ERP';
+      document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+      if(el)el.classList.add('active');
+      const titles={dashboard:'Dashboard',pos:'POS Studio',print:'Print Layouts',retailers:'Retailers',products:'Products',settings:'Settings'};
+      document.getElementById('page-title').textContent=titles[id]||'Dashboard';
     }
 
-    // POS Tabs
-    let posTabCount = 2;
-    function selectPosTab(el, n) {
-      document.querySelectorAll('.pos-tab').forEach(t=>t.classList.remove('active'));
-      if (el) el.classList.add('active');
-    }
-    function addPosTab() { posTabCount++; alert('Sale #' + posTabCount + ' draft created!'); }
-
-    // Billing mode
-    function setBillingMode(m) {
-      const btns = document.querySelectorAll('.credit-cash-switch button');
-      btns.forEach(b=>b.className='');
-      if (m==='credit') btns[0].className='active-credit'; else btns[1].className='active-cash';
-    }
-
-    // Recalculate
-    function recalculatePos() {
-      let tq=0, st=0, tt=0;
-      document.querySelectorAll('#pos-tbody tr').forEach(row => {
-        const q=parseFloat(row.querySelector('.qty-input')?.value)||0;
-        const p=parseFloat(row.querySelector('.price-input')?.value)||0;
-        const d=parseFloat(row.querySelector('.disc-input')?.value)||0;
-        const t=parseFloat(row.querySelector('.tax-select')?.value)||0;
-        const base=Math.max(0,q*p-d); const ta=base*(t/100); const lt=base+ta;
-        tq+=q; st+=base; tt+=ta;
-        const cell=row.querySelector('.line-total-cell'); if(cell) cell.innerText='₹'+lt.toFixed(2);
+    function calc(){
+      let tq=0,st=0,tt=0;
+      document.querySelectorAll('#pos-tbody tr').forEach(r=>{
+        const q=parseFloat(r.querySelector('.q')?.value)||0,p=parseFloat(r.querySelector('.p')?.value)||0,d=parseFloat(r.querySelector('.d')?.value)||0,t=parseFloat(r.querySelector('.t')?.value)||0;
+        const b=Math.max(0,q*p-d),ta=b*(t/100),lt=b+ta;tq+=q;st+=b;tt+=ta;
+        const c=r.querySelector('.lt');if(c)c.textContent='₹'+lt.toFixed(2);
       });
-      const raw=st+tt, chk=document.getElementById('chk-roundoff').checked;
-      const g=chk?Math.round(raw):parseFloat(raw.toFixed(2)), d=(g-raw).toFixed(2);
-      document.getElementById('lbl-total-qty').innerText=tq;
-      document.getElementById('lbl-subtotal').innerText='₹'+st.toFixed(2);
-      document.getElementById('lbl-tax').innerText='₹'+tt.toFixed(2);
-      document.getElementById('lbl-roundoff-delta').innerText=(d>=0?'+'+d:d);
-      document.getElementById('lbl-grand-total').innerText='₹'+g.toFixed(2);
+      const raw=st+tt,ro=document.getElementById('ro').checked;
+      const g=ro?Math.round(raw):parseFloat(raw.toFixed(2)),d=(g-raw).toFixed(2);
+      document.getElementById('lq').textContent=tq;
+      document.getElementById('ls').textContent='₹'+st.toFixed(2);
+      document.getElementById('lt').textContent='₹'+tt.toFixed(2);
+      document.getElementById('lro').textContent=(d>=0?'+'+d:d);
+      document.getElementById('lgt').textContent='₹'+g.toFixed(2);
     }
 
-    // Add Row
-    function addPosRow() {
-      const tb=document.getElementById('pos-tbody'), idx=tb.children.length+1;
-      const tr=document.createElement('tr');
-      tr.innerHTML='<td style="text-align:center;font-weight:800;font-family:monospace;">'+idx+'</td><td><select onchange="recalculatePos()" class="form-control"><option data-price="28" data-tax="5">Sudha Gold Full Cream Milk 500ml</option><option data-price="80" data-tax="5">Sudha Cow Milk 1 Ltr</option><option data-price="35" data-tax="12">Sudha Plain Curd 200g</option></select></td><td><input type="number" value="1" min="1" class="qty-input" oninput="recalculatePos()" style="text-align:center;" /></td><td><input value="Pouch" readonly style="text-align:center;font-size:0.75rem;" /></td><td><input type="number" value="28.00" min="0" step="0.5" class="price-input" oninput="recalculatePos()" style="text-align:right;font-family:monospace;" /></td><td><input type="number" value="0" min="0" class="disc-input" oninput="recalculatePos()" style="text-align:center;" /></td><td><select class="tax-select" onchange="recalculatePos()"><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option></select></td><td style="text-align:right;font-weight:800;font-family:monospace;" class="line-total-cell">₹29.40</td><td style="text-align:center;"><button type="button" onclick="removeRow(this)" style="background:transparent;border:none;color:var(--rose);font-weight:900;cursor:pointer;">✕</button></td>';
-      tb.appendChild(tr); recalculatePos();
+    function addRow(){
+      const tb=document.getElementById('pos-tbody'),n=tb.children.length+1,tr=document.createElement('tr');
+      tr.innerHTML='<td style="text-align:center;font-family:monospace;font-weight:600;">'+n+'</td><td><select onchange="calc()" style="width:100%;"><option data-p="28" data-t="5">Sudha Gold Full Cream 500ml</option><option data-p="80" data-t="5">Sudha Cow Milk 1L</option><option data-p="35" data-t="12">Sudha Plain Curd 200g</option></select></td><td><input type="number" value="1" min="1" class="q" oninput="calc()" style="text-align:center;" /></td><td><input value="Pouch" readonly style="text-align:center;font-size:12px;" /></td><td><input type="number" value="28" min="0" step="0.5" class="p" oninput="calc()" style="text-align:right;font-family:monospace;" /></td><td><input type="number" value="0" min="0" class="d" oninput="calc()" style="text-align:center;" /></td><td><select class="t" onchange="calc()"><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option></select></td><td style="text-align:right;font-weight:600;font-family:monospace;" class="lt">₹29.40</td><td style="text-align:center;"><button onclick="rm(this)" style="background:none;border:none;color:var(--zoho-red);cursor:pointer;font-weight:700;">✕</button></td>';
+      tb.appendChild(tr);calc();
     }
-    function removeRow(b) { const tb=document.getElementById('pos-tbody'); if(tb.children.length<=1)return; b.closest('tr').remove(); recalculatePos(); }
+    function rm(b){const tb=document.getElementById('pos-tbody');if(tb.children.length<=1)return;b.closest('tr').remove();calc()}
 
-    function toggleSection(id) { const b=document.getElementById(id); b.style.display=b.style.display==='none'?'block':'none'; }
-    function setChartPeriod(p) {
-      document.getElementById('fy-btn').className = p==='fy'?'pill primary':'pill';
-      document.getElementById('6m-btn').className = p==='6m'?'pill primary':'pill';
-    }
-
-    // Save & Post
-    function saveAndPostInvoice() {
-      const inv=document.getElementById('pos-inv-no').value, gt=document.getElementById('lbl-grand-total').innerText;
+    function saveInv(){
+      const inv=document.querySelector('#pos input[readonly]').value,gt=document.getElementById('lgt').textContent;
       const ab=document.getElementById('alert-box');
-      document.getElementById('alert-msg').innerText='✔ Sales Invoice '+inv+' ('+gt+') created and posted! Dashboard refreshed.';
+      document.getElementById('alert-msg').textContent='Invoice '+inv+' ('+gt+') posted. Dashboard refreshed.';
       ab.style.display='flex';
-      const ks=document.getElementById('kpi-sales'); if(ks) ks.innerText='₹1,45,787';
-      setTimeout(()=>switchTab('print-tab',document.querySelectorAll('.nav-list a')[2]),1200);
+      setTimeout(()=>switchTab('print',document.querySelectorAll('.sb-item')[2]),1200);
     }
 
-    // Top Expenses rendering
+    // Top Expenses
     (function(){
-      const expenses=[
-        {name:'Dairy Procurement',amount:'₹4,05,900',pct:80,color:'var(--primary)'},
-        {name:'Transport & Fuel',amount:'₹97,080',pct:60,color:'var(--emerald)'},
-        {name:'Cold Storage & Power',amount:'₹27,807',pct:35,color:'var(--amber)'},
-        {name:'Staff Wages',amount:'₹21,240',pct:28,color:'var(--orange)'},
-        {name:'Office & Supplies',amount:'₹12,600',pct:18,color:'var(--rose)'}
-      ];
-      const c=document.getElementById('expense-bars');
-      if(!c) return;
-      expenses.forEach(e=>{
-        const d=document.createElement('div');
-        d.className='expense-row';
-        d.innerHTML='<span style="min-width:170px;font-size:0.82rem;font-weight:700;color:var(--text-main);">'+e.name+'</span><div class="expense-bar-track"><div class="expense-bar-fill" style="width:'+e.pct+'%;background:'+e.color+';"></div></div><span style="min-width:80px;text-align:right;font-family:monospace;font-weight:800;font-size:0.82rem;color:var(--text-sub);">'+e.amount+'</span>';
-        c.appendChild(d);
-      });
+      const data=[{n:'Dairy Procurement',a:'₹4,05,900',p:100},{n:'Transport & Fuel',a:'₹97,080',p:40},{n:'Cold Storage & Power',a:'₹27,807',p:27},{n:'Staff Wages',a:'₹21,240',p:22},{n:'Office & Supplies',a:'₹12,600',p:13},{n:'Others',a:'₹18,260',p:20}];
+      const c=document.getElementById('expenses-list');
+      data.forEach(e=>{const d=document.createElement('div');d.className='exp-row';d.innerHTML='<span class="exp-name">'+e.n+'</span><div class="exp-track"><div class="exp-fill" style="width:'+e.p+'%;"></div></div><span class="exp-amt">'+e.a+'</span>';c.appendChild(d)});
     })();
   </script>
 </body>

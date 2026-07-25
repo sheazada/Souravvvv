@@ -48,31 +48,42 @@ export function Topbar({
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-6 shadow-xs">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          {/* Three-Dot & Hamburger Sidebar Toggle Trigger */}
+    <header className="sticky top-0 z-20 border-b border-[var(--zoho-border)] bg-[var(--zoho-topbar)] px-4 py-0 min-h-[44px] flex items-center md:px-6">
+      <div className="flex flex-1 items-center justify-between gap-3">
+        {/* Left: Hamburger + Page Title */}
+        <div className="flex items-center gap-2.5 min-w-0">
           <button
             type="button"
             onClick={handleSidebarClick}
-            title="Open / Toggle Workspace Navigation Sidebar (⋮)"
-            aria-label="Open Workspace Navigation Sidebar"
-            className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-700 hover:border-cyan-500 hover:bg-cyan-50 hover:text-cyan-900 transition-all shadow-2xs group flex-shrink-0 cursor-pointer"
+            title="Toggle Sidebar"
+            aria-label="Toggle Sidebar"
+            className="flex h-8 w-8 items-center justify-center rounded text-[var(--zoho-text-muted)] hover:bg-[var(--zoho-bg)] hover:text-[var(--zoho-text-primary)] transition-colors flex-shrink-0 cursor-pointer"
           >
-            <span className="text-lg font-black leading-none text-cyan-600 group-hover:scale-110 transition-transform">⋮</span>
-            <span className="text-xs font-bold tracking-wide">Sidebar</span>
+            <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
           </button>
 
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-cyan-600">Dairy Distributor ERP</div>
-            <div className="text-base md:text-lg font-bold text-slate-900 truncate">{title}</div>
+          <div className="min-w-0 flex items-center gap-2">
+            <h1 className="text-[15px] font-semibold text-[var(--zoho-text-primary)] truncate leading-tight">
+              {title}
+            </h1>
           </div>
         </div>
 
-        {area === 'admin' ? (
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full pb-1 sm:pb-0 sm:flex-wrap">
-            {visibleShortcuts.map((shortcut) => (
-              <Link key={shortcut.href} href={shortcut.href} className={`${shortcut.className} flex-shrink-0 whitespace-nowrap`}>
+        {/* Right: Action Shortcuts */}
+        {area === 'admin' && visibleShortcuts.length > 0 ? (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-shrink-0">
+            {visibleShortcuts.map((shortcut, i) => (
+              <Link
+                key={shortcut.href}
+                href={shortcut.href}
+                className={`flex-shrink-0 whitespace-nowrap text-[12px] font-medium px-3 py-1.5 rounded transition-colors ${
+                  i === 0
+                    ? 'bg-[var(--zoho-blue)] text-white hover:bg-[var(--zoho-blue-hover)]'
+                    : 'text-[var(--zoho-text-secondary)] hover:bg-[var(--zoho-bg)] hover:text-[var(--zoho-text-primary)]'
+                }`}
+              >
                 {shortcut.label}
               </Link>
             ))}

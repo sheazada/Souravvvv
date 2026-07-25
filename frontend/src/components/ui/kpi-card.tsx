@@ -1,3 +1,7 @@
+'use client';
+
+import React from 'react';
+
 export function KpiCard({
   label,
   value,
@@ -6,17 +10,33 @@ export function KpiCard({
 }: {
   label: string;
   value: string | number;
-  trend?: string;
-  icon?: string;
+  trend?: { value: string; positive?: boolean };
+  icon?: React.ReactNode;
 }) {
   return (
-    <div className="group rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/90 p-4 shadow-2xs hover:shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
-        {icon && <span className="text-base opacity-75 group-hover:scale-110 transition-transform">{icon}</span>}
+    <div className="zoho-card p-4 flex items-start justify-between gap-3">
+      <div className="min-w-0 flex-1">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--zoho-text-muted)]">
+          {label}
+        </div>
+        <div className="mt-1 text-xl font-semibold text-[var(--zoho-text-primary)] font-mono leading-tight">
+          {value}
+        </div>
+        {trend && (
+          <div
+            className={`mt-1.5 text-[11px] font-medium ${
+              trend.positive ? 'text-[var(--zoho-green)]' : 'text-[var(--zoho-red)]'
+            }`}
+          >
+            {trend.positive ? '↑' : '↓'} {trend.value}
+          </div>
+        )}
       </div>
-      <div className="mt-2 text-2xl md:text-3xl font-black tracking-tight text-slate-950 dark:text-white font-mono">{value}</div>
-      {trend && <div className="mt-1 text-[11px] font-medium text-slate-400 dark:text-slate-500">{trend}</div>}
+      {icon && (
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded bg-[var(--zoho-bg)] text-[var(--zoho-text-muted)]">
+          {icon}
+        </div>
+      )}
     </div>
   );
 }

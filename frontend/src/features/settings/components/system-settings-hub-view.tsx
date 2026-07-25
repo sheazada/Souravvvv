@@ -13,7 +13,6 @@ export function SystemSettingsHubView() {
   const queryClient = useQueryClient();
   const [message, setMessage] = useState<string | null>(null);
 
-  // Ensure next-themes hydration matches cleanly
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -25,15 +24,7 @@ export function SystemSettingsHubView() {
 
   const profile = profileQuery.data?.data;
 
-  const [form, setForm] = useState<{
-    name: string;
-    legalName: string;
-    gstin: string;
-    pan: string;
-    phone: string;
-    email: string;
-    addressLine: string;
-  }>({
+  const [form, setForm] = useState({
     name: 'Sudha Dairy Distributor Demo',
     legalName: 'Sudha Dairy Distributor Patna',
     gstin: '10ABCDE1234F1Z5',
@@ -69,286 +60,144 @@ export function SystemSettingsHubView() {
         addressJson: { line1: form.addressLine },
       });
     },
-    onSuccess: (res) => {
-      setMessage('✔ Organization profile, GSTIN, and legal settings saved successfully across the system!');
+    onSuccess: () => {
+      setMessage('Organization profile and GST settings saved successfully.');
       queryClient.invalidateQueries({ queryKey: ['organization', 'profile'] });
     },
     onError: (err) => {
-      setMessage(`Error saving settings: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setMessage(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     },
   });
 
   if (!mounted) {
-    return <div className="p-6 text-sm text-slate-500">Loading settings hub...</div>;
+    return <div className="p-6 text-[13px] text-[var(--zoho-text-muted)]">Loading settings...</div>;
   }
 
   const activeTheme = theme === 'system' ? systemTheme : theme;
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-5 pb-16">
       <PageHeader
-        title="System Settings & Configuration Hub"
-        description="Manage application appearance (Dark / Light mode), organization legal profile (Names & GSTIN), and global workflow capabilities."
+        title="Settings"
+        description="Manage appearance, company profile, GST configuration, and system modules."
       />
 
       {message && (
-        <div className="flex items-center justify-between rounded-2xl border border-cyan-300 dark:border-cyan-700 bg-cyan-50 dark:bg-cyan-950/40 p-4 text-sm font-bold text-cyan-900 dark:text-cyan-200 shadow-sm">
+        <div className="flex items-center justify-between rounded border border-[var(--zoho-blue-border)] bg-[var(--zoho-blue-light)] p-3 text-[13px] font-medium text-[var(--zoho-blue)]">
           <span>{message}</span>
-          <button type="button" onClick={() => setMessage(null)} className="underline cursor-pointer">
-            Dismiss
-          </button>
+          <button type="button" onClick={() => setMessage(null)} className="text-[12px] underline cursor-pointer">Dismiss</button>
         </div>
       )}
 
-      {/* Section 1: Appearance & Theme Management (`Dark Mode / Light Mode`) */}
-      <section className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-        <div className="border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
-          <h2 className="text-xl font-extrabold text-slate-950 dark:text-white">Appearance & Theme Mode</h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Choose how the Dairy Distributor ERP interface looks on your current device. Switching mode immediately applies across topbars, sidebars, and invoices.
-          </p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          <button
-            type="button"
-            onClick={() => setTheme('light')}
-            className={`flex flex-col items-center justify-center rounded-2xl border-2 p-5 transition-all cursor-pointer ${
-              theme === 'light'
-                ? 'border-cyan-600 bg-cyan-50/60 dark:bg-cyan-950/30 text-cyan-900 dark:text-cyan-200 shadow-md font-bold'
-                : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
-            }`}
-          >
-            <span className="text-3xl mb-2">☀</span>
-            <span className="text-sm font-extrabold">Light Mode</span>
-            <span className="text-[11px] opacity-75 mt-0.5">Crisp day interface</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setTheme('dark')}
-            className={`flex flex-col items-center justify-center rounded-2xl border-2 p-5 transition-all cursor-pointer ${
-              theme === 'dark'
-                ? 'border-cyan-600 bg-cyan-50/60 dark:bg-cyan-950/30 text-cyan-900 dark:text-cyan-200 shadow-md font-bold'
-                : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
-            }`}
-          >
-            <span className="text-3xl mb-2">🌙</span>
-            <span className="text-sm font-extrabold">Dark Mode</span>
-            <span className="text-[11px] opacity-75 mt-0.5">Eye-friendly night mode</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setTheme('system')}
-            className={`flex flex-col items-center justify-center rounded-2xl border-2 p-5 transition-all cursor-pointer ${
-              theme === 'system'
-                ? 'border-cyan-600 bg-cyan-50/60 dark:bg-cyan-950/30 text-cyan-900 dark:text-cyan-200 shadow-md font-bold'
-                : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
-            }`}
-          >
-            <span className="text-3xl mb-2">💻</span>
-            <span className="text-sm font-extrabold">System Auto</span>
-            <span className="text-[11px] opacity-75 mt-0.5">Matches OS setting ({activeTheme})</span>
-          </button>
+      {/* Appearance */}
+      <section className="zoho-card p-5">
+        <h2 className="text-[15px] font-semibold text-[var(--zoho-text-primary)] mb-1">Appearance</h2>
+        <p className="text-[12px] text-[var(--zoho-text-muted)] mb-4">Choose the interface theme for your current device.</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            { key: 'light', label: 'Light', desc: 'Clean white background', icon: '☀' },
+            { key: 'dark', label: 'Dark', desc: 'Reduced eye strain', icon: '🌙' },
+            { key: 'system', label: 'System', desc: `Follows OS (${activeTheme})`, icon: '💻' },
+          ].map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setTheme(opt.key)}
+              className={`flex items-center gap-3 rounded border p-3.5 transition-all cursor-pointer text-left ${
+                theme === opt.key
+                  ? 'border-[var(--zoho-blue)] bg-[var(--zoho-blue-light)] text-[var(--zoho-blue)]'
+                  : 'border-[var(--zoho-border)] bg-[var(--zoho-card)] text-[var(--zoho-text-secondary)] hover:border-[var(--zoho-blue-border)]'
+              }`}
+            >
+              <span className="text-lg">{opt.icon}</span>
+              <div>
+                <div className="text-[13px] font-semibold">{opt.label}</div>
+                <div className="text-[11px] opacity-75">{opt.desc}</div>
+              </div>
+            </button>
+          ))}
         </div>
       </section>
 
-      {/* Section 2: Organization Legal Profile (`Names, GSTIN, PAN, Phone, Address`) */}
-      <section className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-        <div className="border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
-          <h2 className="text-xl font-extrabold text-slate-950 dark:text-white">Company Profile & GST Information</h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            These details automatically appear on your printable Tally / Vyapar Tax Invoices, PDF exports, and POS receipts.
-          </p>
-        </div>
+      {/* Company Profile & GST */}
+      <section className="zoho-card p-5">
+        <h2 className="text-[15px] font-semibold text-[var(--zoho-text-primary)] mb-1">Company Profile & GST</h2>
+        <p className="text-[12px] text-[var(--zoho-text-muted)] mb-5">
+          These details appear on printable invoices, PDF exports, and POS receipts.
+        </p>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              Trade / Brand Name <span className="text-rose-600">*</span>
-            </label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-              placeholder="e.g. Sudha Dairy Distributor"
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              Registered Legal Name
-            </label>
-            <input
-              type="text"
-              value={form.legalName}
-              onChange={(e) => setForm((prev) => ({ ...prev, legalName: e.target.value }))}
-              placeholder="e.g. Sudha Dairy Enterprises Pvt. Ltd."
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              GSTIN (Goods & Services Tax No.)
-            </label>
-            <input
-              type="text"
-              value={form.gstin}
-              onChange={(e) => setForm((prev) => ({ ...prev, gstin: e.target.value.toUpperCase() }))}
-              placeholder="e.g. 10ABCDE1234F1Z5"
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm font-bold font-mono text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              PAN Number
-            </label>
-            <input
-              type="text"
-              value={form.pan}
-              onChange={(e) => setForm((prev) => ({ ...prev, pan: e.target.value.toUpperCase() }))}
-              placeholder="e.g. ABCDE1234F"
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm font-bold font-mono text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              Support / Billing Phone No.
-            </label>
-            <input
-              type="text"
-              value={form.phone}
-              onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-              placeholder="e.g. +91 91234 56789"
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              Official Email Address
-            </label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-              placeholder="e.g. info@sudhadairy.com"
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
-            />
-          </div>
-
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            { key: 'name' as const, label: 'Trade / Brand Name', required: true },
+            { key: 'legalName' as const, label: 'Registered Legal Name' },
+            { key: 'gstin' as const, label: 'GSTIN', mono: true },
+            { key: 'pan' as const, label: 'PAN Number', mono: true },
+            { key: 'phone' as const, label: 'Support Phone' },
+            { key: 'email' as const, label: 'Official Email' },
+          ].map((field) => (
+            <div key={field.key}>
+              <label className="block text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--zoho-text-muted)] mb-1.5">
+                {field.label} {field.required && <span className="text-[var(--zoho-red)]">*</span>}
+              </label>
+              <input
+                type="text"
+                value={form[field.key]}
+                onChange={(e) => setForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                className={`zoho-input ${field.mono ? 'font-mono' : ''}`}
+              />
+            </div>
+          ))}
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-              Complete Registered Address (Printed on Invoice Header)
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--zoho-text-muted)] mb-1.5">
+              Registered Address
             </label>
             <input
               type="text"
               value={form.addressLine}
               onChange={(e) => setForm((prev) => ({ ...prev, addressLine: e.target.value }))}
-              placeholder="e.g. Plot No. 12, Shop No. 4, Boring Road, Patna, Bihar - 800001"
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-cyan-500 focus:outline-none"
+              className="zoho-input"
             />
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end border-t border-slate-100 dark:border-slate-800 pt-4">
+        <div className="mt-4 pt-4 border-t border-[var(--zoho-border-light)] flex justify-end">
           <button
             type="button"
             onClick={() => saveProfileMutation.mutate()}
             disabled={saveProfileMutation.isPending}
-            className="rounded-xl bg-cyan-600 px-8 py-3 text-sm font-black text-white shadow-md hover:bg-cyan-700 disabled:opacity-50 transition-colors cursor-pointer"
+            className="zoho-btn zoho-btn-primary"
           >
-            {saveProfileMutation.isPending ? 'Saving...' : '💾 Save Company Profile & GST Info'}
+            {saveProfileMutation.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </section>
 
-      {/* Section 3: Advanced Module Settings & System Capabilities Shortcuts */}
-      <section className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-        <div className="border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
-          <h2 className="text-xl font-extrabold text-slate-950 dark:text-white">Advanced System & Module Configuration</h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Navigate to dedicated administration modules for financial thresholds, disaster recovery, and offline background synchronization.
-          </p>
-        </div>
+      {/* Advanced Modules */}
+      <section className="zoho-card p-5">
+        <h2 className="text-[15px] font-semibold text-[var(--zoho-text-primary)] mb-1">Advanced Configuration</h2>
+        <p className="text-[12px] text-[var(--zoho-text-muted)] mb-4">Navigate to dedicated administration modules.</p>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Link
-            href="/app/settings/retailer-note-thresholds"
-            className="group flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-4 hover:border-cyan-500 transition-colors"
-          >
-            <div>
-              <span className="text-2xl">⚖</span>
-              <h3 className="mt-2 text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
-                Note Correction Thresholds
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { href: '/app/settings/retailer-note-thresholds', title: 'Note Thresholds', desc: 'Credit/Debit note safety ceilings' },
+            { href: '/app/settings/backups', title: 'Database Backups', desc: 'Automated PostgreSQL dumps' },
+            { href: '/app/organization', title: 'Documents & Logos', desc: 'Legal licenses and letterhead' },
+            { href: '/app/sync', title: 'Offline Sync Center', desc: 'PWA background sync queue' },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group rounded border border-[var(--zoho-border-light)] bg-[var(--zoho-bg)] p-3.5 hover:border-[var(--zoho-blue-border)] transition-colors"
+            >
+              <h3 className="text-[13px] font-semibold text-[var(--zoho-text-primary)] group-hover:text-[var(--zoho-blue)]">
+                {item.title}
               </h3>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Configure safety ceilings for Credit Notes and Retailer Debit Notes.
-              </p>
-            </div>
-            <span className="mt-4 text-xs font-black text-cyan-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
-              Manage →
-            </span>
-          </Link>
-
-          <Link
-            href="/app/settings/backups"
-            className="group flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-4 hover:border-cyan-500 transition-colors"
-          >
-            <div>
-              <span className="text-2xl">🛡️</span>
-              <h3 className="mt-2 text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
-                Disaster Recovery Backups
-              </h3>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Schedule automated PostgreSQL dumps and simulate 1-click restore.
-              </p>
-            </div>
-            <span className="mt-4 text-xs font-black text-cyan-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
-              Manage →
-            </span>
-          </Link>
-
-          <Link
-            href="/app/organization"
-            className="group flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-4 hover:border-cyan-500 transition-colors"
-          >
-            <div>
-              <span className="text-2xl">📎</span>
-              <h3 className="mt-2 text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
-                Legal Documents & Logos
-              </h3>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Upload and store company trade licenses, food safety certs, and letterhead assets.
-              </p>
-            </div>
-            <span className="mt-4 text-xs font-black text-cyan-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
-              Manage →
-            </span>
-          </Link>
-
-          <Link
-            href="/app/sync"
-            className="group flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 p-4 hover:border-cyan-500 transition-colors"
-          >
-            <div>
-              <span className="text-2xl">🔄</span>
-              <h3 className="mt-2 text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
-                Offline PWA Sync Center
-              </h3>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Monitor background synchronization queue when field drivers operate offline.
-              </p>
-            </div>
-            <span className="mt-4 text-xs font-black text-cyan-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
-              Manage →
-            </span>
-          </Link>
+              <p className="mt-0.5 text-[11px] text-[var(--zoho-text-muted)]">{item.desc}</p>
+              <span className="mt-2 inline-block text-[11px] font-medium text-[var(--zoho-blue)] group-hover:underline">
+                Manage →
+              </span>
+            </Link>
+          ))}
         </div>
       </section>
     </div>
