@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudha Dairy ERP — Generated Invoice Preview</title>
+  <style>
+    :root {
+      --bg: #f4f5f7; --card: #fff; --border: #e1e4e8; --border-lt: #eceef1;
+      --blue: #1366d9; --blue-h: #0f56b3; --blue-lt: #ebf2fc;
+      --green: #22a06b; --green-lt: #e3fcef;
+      --red: #de350b; --red-lt: #ffebe6;
+      --amber: #ffab00; --orange: #ff8b00;
+      --txt: #1a1d23; --txt2: #5e6370; --txt3: #8c919a;
+    }
+    [data-theme="dark"] {
+      --bg: #151921; --card: #1e232d; --border: #2d333b; --border-lt: #242930;
+      --blue-lt: rgba(19,102,217,.12); --green-lt: rgba(34,160,107,.15); --red-lt: rgba(222,53,11,.15);
+      --txt: #e6edf3; --txt2: #9ba4b0; --txt3: #6b7280;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif; }
+    body { background:var(--bg); color:var(--txt); font-size:14px; }
+
+    /* Top bar */
+    .top { background:var(--card); border-bottom:1px solid var(--border); padding:0 24px; min-height:44px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+    .top-left { display:flex; align-items:center; gap:12px; }
+    .top-back { background:none; border:none; color:var(--txt3); cursor:pointer; padding:6px; border-radius:4px; display:flex; align-items:center; }
+    .top-back:hover { background:var(--bg); color:var(--txt); }
+    .top-title { font-size:15px; font-weight:600; }
+    .top-actions { display:flex; gap:8px; }
+    .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; font-size:12px; font-weight:600; border-radius:4px; border:1px solid var(--border); background:var(--card); color:var(--txt); cursor:pointer; white-space:nowrap; }
+    .btn:hover { background:var(--bg); }
+    .btn-blue { background:var(--blue); border-color:var(--blue); color:#fff; }
+    .btn-blue:hover { background:var(--blue-h); }
+    .btn-green { background:var(--green); border-color:var(--green); color:#fff; }
+    .btn-green:hover { opacity:.9; }
+    .btn-text { background:none; border-color:transparent; color:var(--blue); }
+    .btn-text:hover { background:var(--blue-lt); }
+
+    .wrap { max-width:900px; margin:0 auto; padding:24px; }
+
+    /* Invoice Card */
+    .inv { background:var(--card); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+
+    /* Status bar */
+    .status-bar { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border-lt); background:var(--bg); flex-wrap:wrap; gap:8px; }
+    .status-tag { display:inline-flex; align-items:center; padding:3px 10px; font-size:11px; font-weight:600; border-radius:3px; }
+    .tag-posted { background:var(--green-lt); color:var(--green); }
+    .tag-draft { background:#f0f0f0; color:var(--txt3); }
+    .tag-paid { background:var(--blue-lt); color:var(--blue); }
+    .tag-partial { background:#fff3e0; color:var(--orange); }
+
+    /* Company header */
+    .comp-hdr { text-align:center; padding:28px 24px 20px; border-bottom:1px solid var(--border-lt); }
+    .comp-name { font-size:20px; font-weight:700; color:var(--txt); margin-bottom:4px; }
+    .comp-addr { font-size:12px; color:var(--txt2); line-height:1.6; }
+    .comp-gst { font-size:12px; font-weight:600; color:var(--txt); margin-top:4px; font-family:monospace; }
+    .inv-title { font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-top:16px; color:var(--blue); border-top:2px solid var(--blue); display:inline-block; padding-top:8px; }
+
+    /* Bill-to & Invoice details */
+    .party-row { display:grid; grid-template-columns:1fr 1fr; gap:24px; padding:20px 24px; border-bottom:1px solid var(--border-lt); }
+    .party-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--txt3); margin-bottom:8px; }
+    .party-name { font-size:14px; font-weight:600; color:var(--txt); }
+    .party-detail { font-size:12px; color:var(--txt2); margin-top:2px; }
+    .inv-detail-grid { display:grid; grid-template-columns:auto 1fr; gap:4px 16px; font-size:12px; }
+    .inv-detail-grid dt { color:var(--txt3); font-weight:500; }
+    .inv-detail-grid dd { color:var(--txt); font-weight:600; font-family:monospace; }
+
+    /* Item table */
+    .item-tbl { width:100%; border-collapse:collapse; font-size:13px; }
+    .item-tbl thead th { background:var(--bg); padding:10px 14px; text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; color:var(--txt3); border-bottom:1px solid var(--border); }
+    .item-tbl thead th.r { text-align:right; }
+    .item-tbl thead th.c { text-align:center; }
+    .item-tbl tbody td { padding:12px 14px; border-bottom:1px solid var(--border-lt); color:var(--txt); }
+    .item-tbl tbody td.r { text-align:right; font-family:monospace; }
+    .item-tbl tbody td.c { text-align:center; }
+    .item-tbl tbody td .item-name { font-weight:600; }
+    .item-tbl tbody td .item-sub { font-size:11px; color:var(--txt3); margin-top:1px; }
+    .item-tbl tfoot td { padding:10px 14px; font-weight:600; }
+
+    /* Tax summary */
+    .tax-section { padding:16px 24px; border-bottom:1px solid var(--border-lt); }
+    .tax-tbl { width:100%; border-collapse:collapse; font-size:12px; }
+    .tax-tbl th { background:var(--bg); padding:8px 12px; text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--txt3); border-bottom:1px solid var(--border); }
+    .tax-tbl th.r { text-align:right; }
+    .tax-tbl th.c { text-align:center; }
+    .tax-tbl td { padding:8px 12px; border-bottom:1px solid var(--border-lt); color:var(--txt); }
+    .tax-tbl td.r { text-align:right; font-family:monospace; }
+    .tax-tbl td.c { text-align:center; }
+
+    /* Totals */
+    .totals { padding:16px 24px; display:flex; justify-content:flex-end; }
+    .totals-box { width:300px; }
+    .total-row { display:flex; justify-content:space-between; padding:5px 0; font-size:13px; color:var(--txt2); }
+    .total-row.grand { font-size:18px; font-weight:700; color:var(--txt); border-top:2px solid var(--border); padding-top:10px; margin-top:6px; }
+    .total-row.grand .amt { font-family:monospace; color:var(--blue); }
+
+    /* Amount in words */
+    .words { padding:12px 24px; border-top:1px solid var(--border-lt); font-size:12px; color:var(--txt2); }
+    .words strong { color:var(--txt); }
+
+    /* Terms & Signature */
+    .footer-row { display:grid; grid-template-columns:1fr 200px; gap:24px; padding:20px 24px; border-top:1px solid var(--border-lt); font-size:12px; }
+    .terms-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--txt3); margin-bottom:6px; }
+    .terms-text { color:var(--txt2); line-height:1.6; }
+    .sig-box { text-align:center; border-top:1px solid var(--txt); padding-top:8px; margin-top:auto; color:var(--txt2); }
+    .sig-box strong { color:var(--txt); }
+
+    /* Payment summary bar */
+    .payment-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-lt); border-top:1px solid var(--border); }
+    .payment-cell { background:var(--card); padding:14px 16px; text-align:center; }
+    .payment-cell .p-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--txt3); }
+    .payment-cell .p-val { font-size:18px; font-weight:700; font-family:monospace; margin-top:4px; }
+    .p-val.blue { color:var(--blue); }
+    .p-val.green { color:var(--green); }
+    .p-val.red { color:var(--red); }
+
+    /* Quick action strip below invoice */
+    .action-strip { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+
+    /* Theme toggle */
+    .theme-btn { position:fixed; bottom:20px; right:20px; z-index:20; padding:8px 16px; border-radius:4px; border:1px solid var(--border); background:var(--card); color:var(--txt); font-size:12px; font-weight:600; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+    .theme-btn:hover { background:var(--bg); }
+
+    @media print {
+      .top, .action-strip, .theme-btn { display:none!important; }
+      .wrap { padding:0; }
+      .inv { border:none; border-radius:0; box-shadow:none; }
+      body { background:#fff; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="top">
+    <div class="top-left">
+      <button class="top-back" onclick="history.back()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+      </button>
+      <span class="top-title">Sales Invoice — INV-2026-0147</span>
+      <span class="status-tag tag-posted">POSTED</span>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-blue" onclick="window.print()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m0 0a48.159 48.159 0 0 1 10.5 0m-10.5 0V5.625A2.25 2.25 0 0 1 7.5 3.375h9a2.25 2.25 0 0 1 2.25 2.25v3.829"/></svg>
+        Print
+      </button>
+      <button class="btn">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+        Download PDF
+      </button>
+      <button class="btn btn-green">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg>
+        Share via WhatsApp
+      </button>
+      <button class="btn btn-text">More Actions ▾</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="inv">
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="status-tag tag-posted">POSTED</span>
+          <span style="font-size:12px;color:var(--txt3);">Created on 25 Jul 2026 at 10:42 AM</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;font-size:12px;">
+          <span style="color:var(--txt3);">Source:</span>
+          <span class="status-tag tag-blue" style="background:var(--blue-lt);color:var(--blue);">Assisted Billing (POS)</span>
+        </div>
+      </div>
+
+      <!-- Company Header -->
+      <div class="comp-hdr">
+        <div class="comp-name">Sudha Dairy Distributor Patna</div>
+        <div class="comp-addr">Plot No. 12, Shop No. 4, Boring Road, Patna, Bihar - 800001</div>
+        <div class="comp-gst">GSTIN: 10ABCDE1234F1Z5 &nbsp;|&nbsp; PAN: ABCDE1234F &nbsp;|&nbsp; Phone: +91 91234 56789</div>
+        <div class="inv-title">Tax Invoice</div>
+      </div>
+
+      <!-- Bill To & Invoice Details -->
+      <div class="party-row">
+        <div>
+          <div class="party-label">Bill To</div>
+          <div class="party-name">Retailer One (Shop #1)</div>
+          <div class="party-detail">Boring Road, Patna, Bihar</div>
+          <div class="party-detail">Phone: +91 99999 99999</div>
+          <div class="party-detail">Code: <span style="font-family:monospace;font-weight:600;">RET-001</span></div>
+          <div class="party-detail" style="margin-top:4px;">GSTIN: <span style="font-family:monospace;">10XYZAB5678C1ZD</span></div>
+        </div>
+        <div>
+          <div class="party-label">Invoice Details</div>
+          <dl class="inv-detail-grid">
+            <dt>Invoice No</dt><dd>INV-2026-0147</dd>
+            <dt>Invoice Date</dt><dd>25-07-2026</dd>
+            <dt>Due Date</dt><dd>09-08-2026</dd>
+            <dt>State of Supply</dt><dd>10 - Bihar</dd>
+            <dt>Place of Supply</dt><dd>Bihar (Intra-State)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Item Table -->
+      <div style="overflow-x:auto;">
+        <table class="item-tbl">
+          <thead>
+            <tr>
+              <th style="width:40px;" class="c">#</th>
+              <th>Description of Goods</th>
+              <th style="width:70px;" class="c">HSN/SAC</th>
+              <th style="width:55px;" class="r">Qty</th>
+              <th style="width:55px;" class="c">Unit</th>
+              <th style="width:90px;" class="r">Rate (₹)</th>
+              <th style="width:80px;" class="r">Disc (₹)</th>
+              <th style="width:60px;" class="c">GST %</th>
+              <th style="width:110px;" class="r">Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="c" style="font-family:monospace;font-weight:600;">1</td>
+              <td><div class="item-name">Sudha Gold Full Cream Milk 500ml</div><div class="item-sub">SKU: MILK-FC-500</div></td>
+              <td class="c" style="font-family:monospace;">0401</td>
+              <td class="r" style="font-weight:600;">20</td>
+              <td class="c">Pouch</td>
+              <td class="r">28.00</td>
+              <td class="r">10.00</td>
+              <td class="c">5%</td>
+              <td class="r" style="font-weight:600;">577.50</td>
+            </tr>
+            <tr>
+              <td class="c" style="font-family:monospace;font-weight:600;">2</td>
+              <td><div class="item-name">Sudha Cow Milk 1 Ltr</div><div class="item-sub">SKU: MILK-CW-1000</div></td>
+              <td class="c" style="font-family:monospace;">0401</td>
+              <td class="r" style="font-weight:600;">15</td>
+              <td class="c">Pouch</td>
+              <td class="r">80.00</td>
+              <td class="r">0.00</td>
+              <td class="c">5%</td>
+              <td class="r" style="font-weight:600;">1,260.00</td>
+            </tr>
+            <tr>
+              <td class="c" style="font-family:monospace;font-weight:600;">3</td>
+              <td><div class="item-name">Sudha Plain Curd 200g</div><div class="item-sub">SKU: CURD-PL-200</div></td>
+              <td class="c" style="font-family:monospace;">0403</td>
+              <td class="r" style="font-weight:600;">10</td>
+              <td class="c">Box</td>
+              <td class="r">35.00</td>
+              <td class="r">0.00</td>
+              <td class="c">12%</td>
+              <td class="r" style="font-weight:600;">392.00</td>
+            </tr>
+            <tr>
+              <td class="c" style="font-family:monospace;font-weight:600;">4</td>
+              <td><div class="item-name">Sudha Paneer 200g</div><div class="item-sub">SKU: PANR-200</div></td>
+              <td class="c" style="font-family:monospace;">0406</td>
+              <td class="r" style="font-weight:600;">8</td>
+              <td class="c">Pack</td>
+              <td class="r">60.00</td>
+              <td class="r">0.00</td>
+              <td class="c">12%</td>
+              <td class="r" style="font-weight:600;">537.60</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align:right;font-size:12px;color:var(--txt3);">Total</td>
+              <td class="r" style="font-weight:700;">53</td>
+              <td></td>
+              <td colspan="2"></td>
+              <td></td>
+              <td class="r" style="font-weight:700;font-size:14px;">2,767.10</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Tax Summary (CGST + SGST Breakdown) -->
+      <div class="tax-section">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--txt3);margin-bottom:8px;">Tax Summary (CGST + SGST Breakdown)</div>
+        <table class="tax-tbl">
+          <thead>
+            <tr>
+              <th>HSN/SAC</th>
+              <th class="r">Taxable Value (₹)</th>
+              <th class="c">CGST Rate</th>
+              <th class="r">CGST Amt (₹)</th>
+              <th class="c">SGST Rate</th>
+              <th class="r">SGST Amt (₹)</th>
+              <th class="r">Total Tax (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-family:monospace;font-weight:600;">0401</td>
+              <td class="r">1,817.50</td>
+              <td class="c">2.5%</td>
+              <td class="r">45.44</td>
+              <td class="c">2.5%</td>
+              <td class="r">45.44</td>
+              <td class="r" style="font-weight:600;">90.88</td>
+            </tr>
+            <tr>
+              <td style="font-family:monospace;font-weight:600;">0403</td>
+              <td class="r">350.00</td>
+              <td class="c">6%</td>
+              <td class="r">21.00</td>
+              <td class="c">6%</td>
+              <td class="r">21.00</td>
+              <td class="r" style="font-weight:600;">42.00</td>
+            </tr>
+            <tr>
+              <td style="font-family:monospace;font-weight:600;">0406</td>
+              <td class="r">480.00</td>
+              <td class="c">6%</td>
+              <td class="r">28.80</td>
+              <td class="c">6%</td>
+              <td class="r">28.80</td>
+              <td class="r" style="font-weight:600;">57.60</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:700;">
+              <td>Total</td>
+              <td class="r">2,647.50</td>
+              <td></td>
+              <td class="r">95.24</td>
+              <td></td>
+              <td class="r">95.24</td>
+              <td class="r" style="font-size:13px;">190.48</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Totals -->
+      <div class="totals">
+        <div class="totals-box">
+          <div class="total-row"><span>Sub Total:</span><span style="font-family:monospace;font-weight:600;">₹2,647.50</span></div>
+          <div class="total-row"><span>Total Tax (GST):</span><span style="font-family:monospace;font-weight:600;color:var(--blue);">₹190.48</span></div>
+          <div class="total-row"><span>Round Off:</span><span style="font-family:monospace;">-0.02</span></div>
+          <div class="total-row grand"><span>GRAND TOTAL:</span><span class="amt">₹2,838.00</span></div>
+        </div>
+      </div>
+
+      <!-- Amount in Words -->
+      <div class="words">
+        <strong>Amount in Words:</strong> Two Thousand Eight Hundred and Thirty Eight Rupees only
+      </div>
+
+      <!-- Payment Summary Bar -->
+      <div class="payment-bar">
+        <div class="payment-cell">
+          <div class="p-label">Invoice Amount</div>
+          <div class="p-val blue">₹2,838.00</div>
+        </div>
+        <div class="payment-cell">
+          <div class="p-label">Amount Received</div>
+          <div class="p-val green">₹2,000.00</div>
+        </div>
+        <div class="payment-cell">
+          <div class="p-label">Balance Due</div>
+          <div class="p-val red">₹838.00</div>
+        </div>
+      </div>
+
+      <!-- Terms & Signature -->
+      <div class="footer-row">
+        <div>
+          <div class="terms-label">Terms & Conditions</div>
+          <div class="terms-text">
+            1. Goods once sold will not be taken back.<br/>
+            2. Interest @ 18% p.a. will be charged on overdue balances.<br/>
+            3. Subject to Patna, Bihar Jurisdiction only.
+          </div>
+          <div style="margin-top:12px;">
+            <div class="terms-label">Bank Details</div>
+            <div class="terms-text">
+              Bank: State Bank of India<br/>
+              A/C No: 39876543210<br/>
+              IFSC: SBIN0001234<br/>
+              Branch: Boring Road, Patna
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div style="text-align:center;font-size:11px;color:var(--txt3);">
+            For <strong style="color:var(--txt);">Sudha Dairy Distributor Patna</strong>
+          </div>
+          <div class="sig-box">
+            <div style="height:40px;"></div>
+            Authorized Signatory
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .inv -->
+
+    <!-- Quick Action Strip -->
+    <div class="action-strip">
+      <button class="btn btn-blue" onclick="window.print()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m0 0a48.159 48.159 0 0 1 10.5 0m-10.5 0V5.625A2.25 2.25 0 0 1 7.5 3.375h9a2.25 2.25 0 0 1 2.25 2.25v3.829"/></svg>
+        Print Invoice
+      </button>
+      <button class="btn">Download PDF</button>
+      <button class="btn btn-green">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg>
+        Share via WhatsApp
+      </button>
+      <button class="btn">Record Payment</button>
+      <button class="btn btn-text">Credit Note / Revise</button>
+      <button class="btn" style="border-color:var(--red);color:var(--red);">Cancel Invoice</button>
+    </div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
+
+  <script>
+    let dark = false;
+    function toggleTheme() {
+      dark = !dark;
+      if (dark) {
+        document.documentElement.setAttribute('data-theme','dark');
+        document.getElementById('themeBtn').textContent = '☀ Light Mode';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.getElementById('themeBtn').textContent = '🌙 Dark Mode';
+      }
+    }
+  </script>
+</body>
+</html>
